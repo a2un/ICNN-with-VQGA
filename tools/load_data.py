@@ -41,7 +41,7 @@ def get_density(label):
 
 def download_dataset(datasets_path,dataset_path,dataset):
     downloadpath_ilsvrcanimalpart = "https://github.com/zqs1022/detanimalpart.git"
-    downloadpath1_vocpart = "http://www.stat.ucla.edu/~xianjie.chen/pascal_part_dataset/trainval.tar.gz"
+    downloadpath1_vocpart = "https://cs.stanford.edu/~roozbeh/pascal-context/trainval.tar.gz"
     downloadpath2_vocpart = "http://host.robots.ox.ac.uk/pascal/VOC/voc2010/VOCtrainval_03-May-2010.tar"
     downloadpath_cub200 = "http://www.vision.caltech.edu/visipedia-data/CUB-200-2011/CUB_200_2011.tgz"
 
