@@ -42,21 +42,22 @@ def get_density(label):
 def download_dataset(datasets_path,dataset_path,dataset):
     downloadpath_ilsvrcanimalpart = "https://github.com/zqs1022/detanimalpart.git"
     downloadpath1_vocpart = "https://cs.stanford.edu/~roozbeh/pascal-context/trainval.tar.gz"
-    downloadpath2_vocpart = "http://host.robots.ox.ac.uk/pascal/VOC/voc2010/VOCtrainval_03-May-2010.tar"
+    # downloadpath2_vocpart = "http://host.robots.ox.ac.uk/pascal/VOC/voc2010/VOCtrainval_03-May-2010.tar"
     downloadpath_cub200 = "http://www.vision.caltech.edu/visipedia-data/CUB-200-2011/CUB_200_2011.tgz"
 
 
     if os.path.exists(dataset_path) == False:
+        os.mkdir(dataset_path)
         if dataset == "ilsvrcanimalpart":
-            os.system(" git clone " + downloadpath_ilsvrcanimalpart + " " + dataset_path)
+            os.system(" git clone " + downloadpath_ilsvrcanimalpart + " " + os.path.joing(dataset_path,'detanimalpart-master.zip'))
             os.system(" unzip " + os.path.join(dataset_path, 'detanimalpart-master.zip') + ' -d ' + dataset_path)
-        elif dataset == "vocpart":
-            os.system(" wget -O " + dataset_path + " --no-check-certificate " + downloadpath1_vocpart)
-            os.system(" wget -O " + dataset_path + " --no-check-certificate " + downloadpath2_vocpart)
+        elif dataset == "voc2010_crop":
+            os.system(" wget -O " + os.path.join(dataset_path,'trainval.tar.gz') + " --no-check-certificate " + downloadpath1_vocpart)
+            # os.system(" wget -O " + dataset_path + " --no-check-certificate " + downloadpath2_vocpart)
             os.system(" tar -xvzf "+ dataset_path + '/trainval.tar.gz')
-            os.system(" tar -xvf " + dataset_path + '/VOCtrainval_03-May-2010.tar')
+            # os.system(" tar -xvf " + dataset_path + '/VOCtrainval_03-May-2010.tar')
         elif dataset == "cub200":
-            os.system(" wget -O " + dataset_path + " --no-check-certificate " + downloadpath_cub200)
+            os.system(" wget -O " + os.path.join(dataset_path,'CUB_200_2011.tgz') + " --no-check-certificate " + downloadpath_cub200)
             os.system(" tar -xvzf "+ dataset_path + '/CUB_200_2011.tgz')
         else:
             print("error: no target dataset!")
