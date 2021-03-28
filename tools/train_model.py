@@ -52,48 +52,51 @@ def train_model(taskid_path, args, net, train_dataloader, val_dataloader, densit
         net.train()
         train_loss = []
         train_acc = []
+        if epoch >=1: continue
         print('Train: ' + "\n" + 'epoch:{}'.format(epoch + 1))
         for index, (image, label) in enumerate(train_dataloader):
-            batch_size = image.shape[0]
+            if index not in range(33,107):  
+              print(index)
+              batch_size = image.shape[0]
 
-            image = Variable(image)
-            image = image.cuda()
-            label = label.cuda()
+              # image = Variable(image)
+              image = image.cuda()
+              label = label.cuda()
 
-            out = net(image, label, torch.Tensor([epoch + 1]), density)
+              out = net(image, label, torch.Tensor([epoch + 1]),density)
 
-            if args.model == "resnet_18" or args.model == "resnet_50" or args.model == "densenet_121":
-                out = torch.unsqueeze(out,2)
-                out = torch.unsqueeze(out, 3)
-            label = Variable(label)
-            if args.losstype == 'logistic':
-                loss = logistic_F.apply(out, label)
-                train_loss.append(loss.cpu().clone().data.numpy())
-                train_correct = label.mul(out)
-                train_correct = torch.max(train_correct, torch.zeros(train_correct.size()).cuda())
-                train_correct = torch.sum((train_correct > 0))
-                train_acc.append(train_correct.cpu().data.numpy())
-            if args.losstype == 'softmax':
-                loss = softmax_F.apply(out, label)
-                train_loss.append(loss.cpu().clone().data.numpy())
-                (tmp, out) = torch.sort(out, dim=1, descending=True)
-                (tmp, label) = torch.max(label, dim=1)
-                label = label.unsqueeze(2)
-                error = ~(out == label)
-                train_correct = args.batchsize - torch.sum(error[:, 0, 0, 0])
-                train_acc.append(train_correct.cpu().data.numpy())
-            optimizer.zero_grad()
-            loss.backward()
-            optimizer.step()
+              if args.model == "resnet_18" or args.model == "resnet_50" or args.model == "densenet_121":
+                  out = torch.unsqueeze(out,2)
+                  out = torch.unsqueeze(out, 3)
+              label = Variable(label)
+              if args.losstype == 'logistic':
+                  loss = logistic_F.apply(out, label)
+                  train_loss.append(loss.cpu().clone().data.numpy())
+                  train_correct = label.mul(out)
+                  train_correct = torch.max(train_correct, torch.zeros(train_correct.size()).cuda())
+                  train_correct = torch.sum((train_correct > 0))
+                  train_acc.append(train_correct.cpu().data.numpy())
+              if args.losstype == 'softmax':
+                  loss = softmax_F.apply(out, label)
+                  train_loss.append(loss.cpu().clone().data.numpy())
+                  (tmp, out) = torch.sort(out, dim=1, descending=True)
+                  (tmp, label) = torch.max(label, dim=1)
+                  label = label.unsqueeze(2)
+                  error = ~(out == label)
+                  train_correct = args.batchsize - torch.sum(error[:, 0, 0, 0])
+                  train_acc.append(train_correct.cpu().data.numpy())
+              optimizer.zero_grad()
+              loss.backward()
+              optimizer.step()
 
-            print('batch:{}/{}'.format(index + 1, len(train_dataloader)) + " " +
-                  'loss:{:.6f}'.format(loss / batch_size) + " " +
-                  'acc:{:.6f}'.format(train_correct.cpu().data.numpy()/(batch_size*args.label_num)))
+              print('batch:{}/{}'.format(index + 1, len(train_dataloader)) + " " +
+                    'loss:{:.6f}'.format(loss / batch_size) + " " +
+                    'acc:{:.6f}'.format(train_correct.cpu().data.numpy()/(batch_size*args.label_num)))
 
-            length = dataset_length['train'] if index + 1 == len(train_dataloader) else args.batchsize * (index + 1)
-            if (index + 1) % 10:
-                writer.add_scalar('Train/Loss', sum(train_loss)/ length, epoch)
-                writer.add_scalar('Train/acc', sum(train_acc)/ (length*args.label_num), epoch)
+              length = dataset_length['train'] if index + 1 == len(train_dataloader) else args.batchsize * (index + 1)
+              if (index + 1) % 10:
+                  writer.add_scalar('Train/Loss', sum(train_loss)/ length, epoch)
+                  writer.add_scalar('Train/acc', sum(train_acc)/ (length*args.label_num), epoch)
 
 
         # eval
