@@ -18,7 +18,7 @@ def train_model(taskid_path, args, net, train_dataloader, val_dataloader, densit
     writer = SummaryWriter(log_path)
 
     torch.cuda.set_device(args.gpu_id)
-    net = net.to(args.gpu_id)
+    net = net.cuda()
 
     max_acc = 0
     max_epoch = 0
@@ -57,8 +57,8 @@ def train_model(taskid_path, args, net, train_dataloader, val_dataloader, densit
             batch_size = image.shape[0]
 
             image = Variable(image)
-            image = image.to(args.gpu_id)
-            label = label.to(args.gpu_id)
+            image = image.cuda()
+            label = label.cuda()
 
             out = net(image, label, torch.Tensor([epoch + 1]), density)
 
@@ -70,7 +70,7 @@ def train_model(taskid_path, args, net, train_dataloader, val_dataloader, densit
                 loss = logistic_F.apply(out, label)
                 train_loss.append(loss.cpu().clone().data.numpy())
                 train_correct = label.mul(out)
-                train_correct = torch.max(train_correct, torch.zeros(train_correct.size()).to(args.gpu_id))
+                train_correct = torch.max(train_correct, torch.zeros(train_correct.size()).cuda())
                 train_correct = torch.sum((train_correct > 0))
                 train_acc.append(train_correct.cpu().data.numpy())
             if args.losstype == 'softmax':
@@ -106,8 +106,8 @@ def train_model(taskid_path, args, net, train_dataloader, val_dataloader, densit
                 print('Val: ' + "\n" + 'epoch:{}'.format(epoch + 1))
                 batch_size = image.shape[0]
                 image = Variable(image)
-                image = image.to(args.gpu_id)
-                label = label.to(args.gpu_id)
+                image = image.cuda()
+                label = label.cuda()
 
                 out = net(image, label, torch.Tensor([epoch + 1]), density)
                 if args.model == "resnet_18" or args.model == "resnet_50" or args.model == "densenet_121":
@@ -118,7 +118,7 @@ def train_model(taskid_path, args, net, train_dataloader, val_dataloader, densit
                     loss = logistic_F.apply(out, label)
                     eval_loss.append(loss.cpu().data.numpy())
                     eval_correct = label.mul(out)
-                    eval_correct = torch.max(eval_correct, torch.zeros(eval_correct.size()).to(args.gpu_id))
+                    eval_correct = torch.max(eval_correct, torch.zeros(eval_correct.size()).cuda())
                     eval_correct = torch.sum((eval_correct > 0))
                     eval_acc.append(eval_correct.cpu().data.numpy())
                 if args.losstype == 'softmax':
