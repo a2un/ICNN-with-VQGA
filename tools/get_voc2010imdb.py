@@ -35,15 +35,17 @@ def readAnnotation(root_path, dataset, dataset_path, categoryName):
     for line in f.readlines():
         words = line.split(',')
         path = words[1]
-        randnum = randint(1,4)
-        if randnum == 1:#int(words[2])==0 and int(words[3])==1:
-            objset_train_true.append({'filename':dataset_img_path+'/'+path})
-        if randnum == 2:#int(words[2])==0 and int(words[3])==0:
-            objset_val_true.append({'filename':dataset_img_path+'/'+path})
-        if randnum == 3:#int(words[2])==1 and int(words[3])==1:
-            objset_train_false.append({'filename':dataset_img_path+'/'+path})
-        if randnum == 4:#int(words[2])==1 and int(words[3])==0:
-            objset_val_false.append({'filename':dataset_img_path+'/'+path})
+        randnum = randint(0,1)
+        if randnum == 0:
+            if int(words[3])==1:
+                objset_train_true.append({'filename':dataset_img_path+'/'+path})
+            if int(words[3])==0:
+                objset_train_false.append({'filename':dataset_img_path+'/'+path})
+        if randnum == 1:
+            if int(words[3])==1:
+                objset_val_true.append({'filename':dataset_img_path+'/'+path})
+            if int(words[3])==0:
+                objset_val_false.append({'filename':dataset_img_path+'/'+path})
 
     return objset_train_true,objset_train_false,objset_val_true,objset_val_false
 

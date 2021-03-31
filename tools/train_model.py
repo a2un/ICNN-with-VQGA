@@ -59,7 +59,7 @@ def train_model(taskid_path, args, net, train_dataloader, val_dataloader, densit
               print(index)
               batch_size = image.shape[0]
 
-              # image = Variable(image)
+              image = Variable(image)
               image = image.cuda()
               label = label.cuda()
 
