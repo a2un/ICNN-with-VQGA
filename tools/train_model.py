@@ -52,11 +52,10 @@ def train_model(taskid_path, args, net, train_dataloader, val_dataloader, densit
         net.train()
         train_loss = []
         train_acc = []
-        if epoch >=1: continue
+        
         print('Train: ' + "\n" + 'epoch:{}'.format(epoch + 1))
         for index, (image, label) in enumerate(train_dataloader):
-            if index not in range(33,107):  
-              print(index)
+              print(f'TRAIN - epoch: {epoch} index:{index}')
               batch_size = image.shape[0]
 
               image = Variable(image)
