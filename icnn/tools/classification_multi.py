@@ -1,11 +1,11 @@
 import os
 import h5py
-from tools.load_data import load_data
-from tools.init_model import init_model
-from tools.train_model import train_model
-from tools.showresult import showresult
-from tools.lib import *
-from tools.load_data_multi import load_data_multi
+from icnn.tools.load_data import load_data
+from icnn.tools.init_model import init_model
+from icnn.tools.train_model import train_model
+from icnn.tools.showresult import showresult
+from icnn.tools.lib import *
+from icnn.tools.load_data_multi import load_data_multi
 
 
 def classification_multi(root_path,args):

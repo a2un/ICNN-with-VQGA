@@ -2,10 +2,10 @@ import os
 import math
 import torch
 import numpy as np
-from tools.sgd import SGD
+from icnn.tools.sgd import SGD
 import torch.autograd.variable as Variable
-from tools.logistic import logistic_F
-from tools.softmax import softmax_F
+from icnn.tools.logistic import logistic_F
+from icnn.tools.softmax import softmax_F
 from tensorboardX import SummaryWriter
 from tools.lib import *
 from torch import nn

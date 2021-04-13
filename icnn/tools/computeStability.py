@@ -2,11 +2,11 @@ import os
 from scipy.io import loadmat
 import h5py
 import numpy as np
-from tools.getDistSqrtVar import getDistSqrtVar
-from tools.getCNNFeature import getCNNFeature
-from tools.get_ilsvrimdb import readAnnotation as ilsvr_readAnnotation
-from tools.get_cubimdb import readAnnotation as cub_readAnnotation
-from tools.get_vocimdb import readAnnotation as voc_readAnnotation
+from icnn.tools.getDistSqrtVar import getDistSqrtVar
+from icnn.tools.getCNNFeature import getCNNFeature
+from icnn.tools.get_ilsvrimdb import readAnnotation as ilsvr_readAnnotation
+from icnn.tools.get_cubimdb import readAnnotation as cub_readAnnotation
+from icnn.tools.get_vocimdb import readAnnotation as voc_readAnnotation
 
 def x2P(idx_h, idx_w, layerID, convnet):
     idx_h = idx_h[np.newaxis, :]

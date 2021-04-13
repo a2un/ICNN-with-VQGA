@@ -1,11 +1,11 @@
 import os
 import argparse
 #from tools import train_net
-from tools.lib import init_lr
+from icnn.tools.lib import init_lr
 import random
 import numpy as np
-from tools.classification import classification
-from tools.classification_multi import classification_multi
+from icnn.tools.classification import classification
+from icnn.tools.classification_multi import classification_multi
 import torch
 
 def seed_torch(seed=0):

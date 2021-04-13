@@ -2,10 +2,10 @@ import os
 import torch
 import h5py
 import numpy as np
-from tools.getConvNetPara import getConvNetPara
-from tools.computeStability import computeStability
-from tools.computeStability_multi import computeStability_multi
-from tools.lib import*
+from icnn.tools.getConvNetPara import getConvNetPara
+from icnn.tools.computeStability import computeStability
+from icnn.tools.computeStability_multi import computeStability_multi
+from icnn.tools.lib import*
 
 
 def step_computeStability(root_path,dataset,dataset_path, truthpart_path, label_name, net, model, layerID, epochnum, partList, partRate, imdb_mean):

@@ -3,12 +3,12 @@ import os
 from scipy.io import loadmat
 import h5py
 import numpy as np
-from tools.getDistSqrtVar import getDistSqrtVar
-from tools.getCNNFeature import getCNNFeature
-from tools.get_ilsvrimdb import readAnnotation as ilsvr_readAnnotation
-from tools.get_cubimdb import readAnnotation as cub_readAnnotation
-from tools.get_vocimdb import readAnnotation as voc_readAnnotation
-from tools.computeStability import x2P
+from icnn.tools.getDistSqrtVar import getDistSqrtVar
+from icnn.tools.getCNNFeature import getCNNFeature
+from icnn.tools.get_ilsvrimdb import readAnnotation as ilsvr_readAnnotation
+from icnn.tools.get_cubimdb import readAnnotation as cub_readAnnotation
+from icnn.tools.get_vocimdb import readAnnotation as voc_readAnnotation
+from icnn.tools.computeStability import x2P
 
 def computeStability_multi(patchNumPerPattern, root_path,dataset,dataset_path, truthpart_path, label_name, net, model, convnet, layerID, epochnum, partList, imdb_mean):
 

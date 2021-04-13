@@ -1,6 +1,6 @@
 import torch
 import torch.nn.functional as F
-from tools.get_ilsvrimdb import getI
+from icnn.tools.get_ilsvrimdb import getI
 
 def get_x(net, im, label, Iter, density,model):
     if model == "vgg_vd_16":
