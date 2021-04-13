@@ -4,6 +4,7 @@ from utils.preproc import proc
 from icnn.tools.classification import classification
 from icnn.tools.classification_multi import classification_multi
 from dataclasses import dataclass
+from icnn.tools.lib import init_lr
 
 # Device configuration
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
@@ -63,7 +64,7 @@ for epoch in range(1,config['num_epochs']+1):
 
 def ICNN():
 
-    root_path = path.join(os.getcwd(),'old-model') #'/data2/lqm/pytorch_interpretable/py_icnn        
+    root_path = path.join(path.dirname(os.path.realpath(__file__)),'icnn') #path.join(os.getcwd(),'icnn') #'/data2/lqm/pytorch_interpretable/py_icnn        
 
     @dataclass
     class args:
