@@ -1,6 +1,9 @@
 import argparse, os, pathlib, numpy as np, torch, torch.nn as nn
 from torch.nn.utils.rnn import pack_padded_sequence
 from utils.preproc import proc
+from icnn.tools.classification import classification
+from icnn.tools.classification_multi import classification_multi
+from dataclasses import dataclass
 
 # Device configuration
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
@@ -54,3 +57,41 @@ for epoch in range(1,config['num_epochs']+1):
 		
 	torch.save(decoder.state_dict(), os.path.join(config['model_dir'], f'decoder-{epoch}.pth'))
 	torch.save(encoder.state_dict(), os.path.join(config['model_dir'], f'encoder-{epoch}.pth'))
+
+
+
+
+def ICNN():
+
+    root_path = path.join(os.getcwd(),'old-model') #'/data2/lqm/pytorch_interpretable/py_icnn        
+
+    @dataclass
+    class args:
+        gpu_id: int  = 0
+        task_name: str = 'classification'
+        task_id:int = 0
+        dataset:str = 'voc2010_crop'
+        imagesize:int = 224
+        label_name:str = 'bird'
+        label_num:int = 1
+        model:str = 'resnet_18'
+        losstype:str = 'logistic'
+        batchsize:int = 8
+        dropoutrate:int = 0
+        lr:int = 0
+        epochnum:int = 0
+        weightdecay:int = 0.0005
+        momentum:int = 0.09
+    
+    args.lr, args.epochnum = init_lr(args.model,args.label_num,args.losstype) #init lr and epochnum
+    if(args.task_name=='classification'):
+        if args.dataset == 'celeba':
+            args.label_num = 40
+        classification(root_path, args)
+    else:
+        if args.dataset == 'vocpart':
+            args.label_name = ['bird','cat','cow','dog','horse','sheep']
+            args.label_num = 6
+        classification_multi(root_path,args)
+ICNN()
+
