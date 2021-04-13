@@ -1,8 +1,8 @@
 import argparse, os, pathlib, numpy as np, torch, torch.nn as nn
 from torch.nn.utils.rnn import pack_padded_sequence
 from utils.preproc import proc
-from icnn.icnn.tools.classification import classification
-from icnn.icnn.tools.classification_multi import classification_multi
+from icnn.tools.classification import classification
+from icnn.tools.classification_multi import classification_multi
 from dataclasses import dataclass
 
 # Device configuration

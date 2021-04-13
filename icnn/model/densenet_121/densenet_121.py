@@ -8,7 +8,7 @@ from torch import Tensor
 import torch.nn as nn
 import torch.nn.functional as F
 from collections import OrderedDict
-from model.densenet_121.conv_mask import conv_mask
+from icnn.model.densenet_121.conv_mask import conv_mask
 
 class _DenseLayer(nn.Module):
     def __init__(self, num_input_features, growth_rate, bn_size, drop_rate, memory_efficient=False):

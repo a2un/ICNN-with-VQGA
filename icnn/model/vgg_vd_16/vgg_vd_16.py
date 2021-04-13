@@ -8,7 +8,7 @@ from scipy.io import loadmat
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from model.vgg_vd_16.conv_mask import conv_mask
+from icnn.model.vgg_vd_16.conv_mask import conv_mask
 
 
 
