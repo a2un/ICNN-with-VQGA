@@ -35,6 +35,8 @@ def classification(root_path,args):
     print("\n")
     print(max_acc)
 
+    return net
+
 
 
 

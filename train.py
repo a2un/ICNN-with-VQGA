@@ -1,6 +1,7 @@
 import argparse, os, pathlib, numpy as np, torch, torch.nn as nn
 from torch.nn.utils.rnn import pack_padded_sequence
 from utils.preproc import proc
+from utils.convert_to_icnn_format import data_format_converter
 from icnn.tools.classification import classification
 from icnn.tools.classification_multi import classification_multi
 from dataclasses import dataclass
@@ -62,9 +63,9 @@ for epoch in range(1,config['num_epochs']+1):
 
 
 
-def ICNN():
+def ICNN(categoryname):
 
-    root_path = path.join(path.dirname(os.path.realpath(__file__)),'icnn') #path.join(os.getcwd(),'icnn') #'/data2/lqm/pytorch_interpretable/py_icnn        
+    root_path = os.path.join(os.path.dirname(os.path.realpath(__file__)),'icnn') #path.join(os.getcwd(),'icnn') #'/data2/lqm/pytorch_interpretable/py_icnn        
 
     @dataclass
     class args:
@@ -73,14 +74,14 @@ def ICNN():
         task_id:int = 0
         dataset:str = 'voc2010_crop'
         imagesize:int = 224
-        label_name:str = 'bird'
+        label_name:str = categoryname
         label_num:int = 1
         model:str = 'resnet_18'
         losstype:str = 'logistic'
-        batchsize:int = 8
+        batchsize:int = 16
         dropoutrate:int = 0
         lr:int = 0
-        epochnum:int = 0
+        epochnum:int = 2
         weightdecay:int = 0.0005
         momentum:int = 0.09
     
@@ -88,11 +89,15 @@ def ICNN():
     if(args.task_name=='classification'):
         if args.dataset == 'celeba':
             args.label_num = 40
-        classification(root_path, args)
+        return classification(root_path, args)
     else:
         if args.dataset == 'vocpart':
-            args.label_name = ['bird','cat','cow','dog','horse','sheep']
+            args.label_name = [''.join(categoryname.split()).lower()]
             args.label_num = 6
-        classification_multi(root_path,args)
-ICNN()
+        return classification_multi(root_path,args)
 
+
+for categoryname in ['Person','Chair','Car','Dining Table','Cup']:
+    data_format_converter(categoryname,source_data_path,dest_data_path)             ## create text files in ICNN format
+    net = ICNN(categoryname)
+    torch.save(net.state_dict(), os.path.join(config['model_dir'], f'icnn-{''.join(categoryname.split())}.pth'))
