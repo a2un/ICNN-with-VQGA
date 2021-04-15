@@ -96,8 +96,14 @@ def ICNN(categoryname):
             args.label_num = 6
         return classification_multi(root_path,args)
 
+source_data_path = os.path.join(os.path.realpath(__file__),'data/data_files/{0}') 
+dest_data_path = os.path.join(os.path.realpath(__file__),'datasets/voc2010_crop/{0}_info.txt')
 
-for categoryname in ['Person','Chair','Car','Dining Table','Cup']:
-    data_format_converter(categoryname,source_data_path,dest_data_path)             ## create text files in ICNN format
+train_lines = open(source_data_path.format('train_data.txt'),'r').readlines()
+val_lines = open(source_data_path.format('val_data.txt'),'r').readlines()
+
+for categoryname in list(config['categories'].keys()):
+    ## create text files in ICNN format
+    data_format_converter(config['categories']['_'.join(categoryname.split())],dest_data_path,train_lines,val_lines)
     net = ICNN(categoryname)
-    torch.save(net.state_dict(), os.path.join(config['model_dir'], f'icnn-{''.join(categoryname.split())}.pth'))
+    torch.save(net.state_dict(), os.path.join(config['model_dir'], f"icnn-{''.join(categoryname.split())}.pth"))

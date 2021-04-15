@@ -42,9 +42,9 @@ def readAnnotation(root_path, dataset, dataset_path, categoryName):
         if int(words[2])==0 and int(words[3])==0:
             objset_train_false.append({'filename':dataset_img_path+'/'+path})
     
-        if int(words[3])==1:
+        if int(words[2]) == 1 and int(words[3])==1:
             objset_val_true.append({'filename':dataset_img_path+'/'+path})
-        if int(words[3])==0:
+        if int(words[2]) == 1 and int(words[3])==0:
             objset_val_false.append({'filename':dataset_img_path+'/'+path})
 
     return objset_train_true,objset_train_false,objset_val_true,objset_val_false
