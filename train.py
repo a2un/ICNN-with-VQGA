@@ -37,14 +37,16 @@ def main():
 		for i, (images, categories, questions, lengths) in enumerate(data_loader):
 			
 			# Set mini-batch dataset
-			images = [image.to(device) for image in images]
-			questions = questions.to(device)
-			categories = [category.to(device) for category in categories]
-			targets = pack_padded_sequence(questions, lengths, batch_first=True)[0]
 			
-			# Forward, backward and optimize
-			features = encoder(images, categories, torch.Tensor([epoch + 1]),torch.mean(torch.from_numpy(np.arange(1,80)).float())) #encoder(images)
-			outputs = decoder(features, questions, lengths)
+			targets = pack_padded_sequence(questions, lengths, batch_first=True)[0]
+
+			for image, category_list, question in zip(images, categories, questions):		
+				images = image.to(device)
+				questions = questions.to(device)
+				category = category.to(device)
+				# Forward, backward and optimize
+				features = encoder(image, category, torch.Tensor([epoch + 1]),torch.mean(torch.from_numpy(np.arange(1,80)).float())) #encoder(images)
+			# outputs = decoder(features, questions, lengths)
 			loss = criterion(outputs, targets)
 			decoder.zero_grad()
 			encoder.zero_grad()
