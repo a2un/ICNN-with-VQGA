@@ -37,9 +37,9 @@ def main():
 		for i, (images, categories, questions, lengths) in enumerate(data_loader):
 			
 			# Set mini-batch dataset
-			images = images.to(device)
+			images = [image.to(device) for image in images]
 			questions = questions.to(device)
-			categories = categories.to(device)
+			categories = [category.to(device) for category in categories]
 			targets = pack_padded_sequence(questions, lengths, batch_first=True)[0]
 			
 			# Forward, backward and optimize
