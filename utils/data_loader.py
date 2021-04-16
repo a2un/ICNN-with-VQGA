@@ -34,13 +34,13 @@ class VQGDataset(data.Dataset):
                 row_data = line.split('\t')
                 img_id = row_data[0]
                 img_url = row_data[2]
-                category = row_data[3].split('---')[0] if len(row_data[3].split('---')) > 0 else row_data[3]
-                categories.append(category)
+                categories = row_data[3].split('---')
                 questions = row_data[q_row].split('---')
                 self.img_to_url[img_id] = img_url
                 
                 for question in questions:
                     self.questions.append(question)
+                    self.categories.append(categories[questions.index(question)])
                     self.images.append(img_id)
                     
     def __getitem__(self, index):
