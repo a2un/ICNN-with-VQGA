@@ -34,15 +34,16 @@ def main():
 	# Train the models
 	total_step = len(data_loader)
 	for epoch in range(1,config['num_epochs']+1):
-		for i, (images, questions, lengths) in enumerate(data_loader):
+		for i, (images, categories, questions, lengths) in enumerate(data_loader):
 			
 			# Set mini-batch dataset
 			images = images.to(device)
 			questions = questions.to(device)
+			categories = categories.to(device)
 			targets = pack_padded_sequence(questions, lengths, batch_first=True)[0]
 			
 			# Forward, backward and optimize
-			features = encoder(images, args.categoryname, torch.Tensor([epoch + 1]),torch.mean(torch.from_numpy(np.arange(1,80)).float())) #encoder(images)
+			features = encoder(images, categories, torch.Tensor([epoch + 1]),torch.mean(torch.from_numpy(np.arange(1,80)).float())) #encoder(images)
 			outputs = decoder(features, questions, lengths)
 			loss = criterion(outputs, targets)
 			decoder.zero_grad()

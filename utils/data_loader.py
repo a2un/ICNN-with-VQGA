@@ -17,6 +17,7 @@ class VQGDataset(data.Dataset):
         self.img_dir = img_dir
         self.vocab = vocab
         self.transform = transform
+        self.categories = []
         self.questions = []
         self.images = []
         self.img_to_url = {}
@@ -33,6 +34,8 @@ class VQGDataset(data.Dataset):
                 row_data = line.split('\t')
                 img_id = row_data[0]
                 img_url = row_data[2]
+                category = row_data[3].split('---')[0] if len(row_data[3].split('---')) > 0 else row_data[3]
+                categories.append(category)
                 questions = row_data[q_row].split('---')
                 self.img_to_url[img_id] = img_url
                 
@@ -42,6 +45,7 @@ class VQGDataset(data.Dataset):
                     
     def __getitem__(self, index):
         """Returns one data pair (image and question)."""
+        category = self.categories[index]
         question = self.questions[index]
         img_id = self.images[index]
         img_file_path = os.path.join(self.img_dir, img_id)
