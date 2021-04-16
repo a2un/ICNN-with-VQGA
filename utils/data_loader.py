@@ -5,6 +5,9 @@ from PIL import Image
 from utils.vocab import Vocabulary, tokenize
 
 class VQGDataset(data.Dataset):
+
+    CAT_IDS = [1, 62, 3, 67, 47]
+    
     def __init__(self, img_dir, data_file, data_set, vocab, transform=None):
         """Set the path for images, captions and vocabulary wrapper.
         
@@ -34,19 +37,21 @@ class VQGDataset(data.Dataset):
                 row_data = line.split('\t')
                 img_id = row_data[0]
                 img_url = row_data[2]
-                categories = row_data[3].split('---')
+                cat_set = set([int(i) for i in row_data[3].split('---')])
+                cat_list = []
+                for cat in VQGDataset.CAT_IDS:
+                    cat_list.append(1 if cat in cat_set else -1)
                 questions = row_data[q_row].split('---')
                 self.img_to_url[img_id] = img_url
                 
                 for question in questions:
+                    self.categories.append(cat_list)
                     self.questions.append(question)
-                    category = categories[questions.index(question)] if len(categories) == len(questions) else categories
-                    self.categories.append(category)
                     self.images.append(img_id)
-                    
+                 
     def __getitem__(self, index):
         """Returns one data pair (image and question)."""
-        category = self.categories[index]
+        categories = self.categories[index]
         question = self.questions[index]
         img_id = self.images[index]
         img_file_path = os.path.join(self.img_dir, img_id)
@@ -63,8 +68,7 @@ class VQGDataset(data.Dataset):
         target = [self.vocab('<start>')]
         target.extend([self.vocab(token) for token in tokenize(question)])
         target.append(self.vocab('<end>'))
-        target = torch.Tensor(target)
-        return image, category, target
+        return image, torch.Tensor(categories), torch.Tensor(target)
 
     def __len__(self):
         return len(self.questions)
