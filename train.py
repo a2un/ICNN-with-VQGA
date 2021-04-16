@@ -39,7 +39,7 @@ def main():
 			
 			# Set mini-batch dataset
 			
-			targets = pack_padded_sequence(questions, lengths, batch_first=True, enforced_sorted=False)[0]
+			targets = pack_padded_sequence(questions, lengths, batch_first=True, enforce_sorted=False)[0]
 
 			for image, category_list, question in zip(images, categories, questions):		
 				images = image.to(device)
