@@ -70,6 +70,9 @@ class resnet_18(nn.Module):
         self.losstype = losstype
         self.inplanes = 64
         self.dilation = 1
+        self.linear = nn.Linear(2048, 16)
+        self.bn = nn.BatchNorm1d(16, momentum=0.01)
+        
         if replace_stride_with_dilation is None:
             # each element in the tuple indicates if we should replace
             # the 2x2 stride with a dilated convolution instead
