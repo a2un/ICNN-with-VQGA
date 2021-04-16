@@ -40,7 +40,8 @@ class VQGDataset(data.Dataset):
                 
                 for question in questions:
                     self.questions.append(question)
-                    self.categories.append(categories[questions.index(question)])
+                    category = categories[questions.index(question)] if len(categories) == len(questions) else categories
+                    self.categories.append(category)
                     self.images.append(img_id)
                     
     def __getitem__(self, index):
