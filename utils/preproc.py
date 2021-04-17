@@ -3,8 +3,8 @@ from model3 import EncoderCNN, DecoderRNN
 from torchvision import transforms
 from utils.vocab import Vocabulary
 from utils.data_loader import get_loader 
-from icnn.tools.lib import init_lr
-from icnn.model.resnet_18.resnet_18 import resnet_18
+from tools.lib import init_lr
+from model.resnet_18.resnet_18 import resnet_18
 
 def proc(args, mode, root_dir, file_name):
 

@@ -3,7 +3,7 @@ from torch.nn.utils.rnn import pack_padded_sequence
 from utils.preproc import proc
 from dataclasses import dataclass
 import torch.autograd.variable as Variable
-# from icnn.tools.load_data import get_density
+
 # Device configuration
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 

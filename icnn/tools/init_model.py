@@ -1,12 +1,12 @@
 import os
 import numpy as np
-from icnn.model.vgg_vd_16.vgg_vd_16 import vgg_vd_16
-from icnn.model.alexnet.alexnet import alexnet
-from icnn.model.vgg_m.vgg_m import vgg_m
-from icnn.model.vgg_s.vgg_s import vgg_s
-from icnn.model.resnet_18.resnet_18 import resnet_18
-from icnn.model.resnet_50.resnet_50 import resnet_50
-from icnn.model.densenet_121.densenet_121 import densenet_121
+from model.vgg_vd_16.vgg_vd_16 import vgg_vd_16
+from model.alexnet.alexnet import alexnet
+from model.vgg_m.vgg_m import vgg_m
+from model.vgg_s.vgg_s import vgg_s
+from model.resnet_18.resnet_18 import resnet_18
+from model.resnet_50.resnet_50 import resnet_50
+from model.densenet_121.densenet_121 import densenet_121
 
 def get_net(model, model_path, label_num, dropoutrate, losstype):
     if(model == "vgg_vd_16"):

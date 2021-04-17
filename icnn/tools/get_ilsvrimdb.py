@@ -4,7 +4,7 @@ import h5py
 import matplotlib.image as mpimg
 import math
 import numpy as np
-from icnn.tools.lib import cv2imread
+from tools.lib import cv2imread
 
 # different get+dataset+imdb.py has deffernet readAnnotation getNegObjSet and getI functions
 

@@ -67,7 +67,7 @@ def getMask(mask_parameter, mask_weight, posTempX, posTempY, bs, depth, h, w):
 
 
 def get_sliceMag(sliceMag,label,x):
-    print(label)
+
     for lab in range(label.shape[1]):
         index = (label[:, lab, :, :] == 1).reshape(label.shape[0])
         if torch.sum(index) != 0:

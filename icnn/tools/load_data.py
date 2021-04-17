@@ -3,14 +3,14 @@ import h5py
 import numpy as np
 import torch
 from torch.utils.data import DataLoader
-from icnn.tools.get_ilsvrimdb import get_ilsvrimdb
-from icnn.tools.get_vocimdb import get_vocimdb
-from icnn.tools.get_cubimdb import get_cubimdb
-from icnn.tools.get_voc2010imdb import get_voc2010imdb
-from icnn.tools.get_helenimdb import get_helenimdb
-from icnn.tools.get_celebaimdb import get_celebaimdb
-from icnn.tools.get_cubsampleimdb import get_cubsampleimdb
-from icnn.tools.lib import *
+from tools.get_ilsvrimdb import get_ilsvrimdb
+from tools.get_vocimdb import get_vocimdb
+from tools.get_cubimdb import get_cubimdb
+from tools.get_voc2010imdb import get_voc2010imdb
+from tools.get_helenimdb import get_helenimdb
+from tools.get_celebaimdb import get_celebaimdb
+from tools.get_cubsampleimdb import get_cubsampleimdb
+from tools.lib import *
 
 
 class MyDataset(torch.utils.data.Dataset):

@@ -4,10 +4,10 @@ import h5py
 import matplotlib.image as mpimg
 import math
 import numpy as np
-from icnn.tools.lib import cv2imread
-from icnn.tools.lib import load_txt
-from icnn.tools.get_ilsvrimdb import getNegObjSet
-from icnn.tools.get_ilsvrimdb import getI
+from tools.lib import cv2imread
+from tools.lib import load_txt
+from tools.get_ilsvrimdb import getNegObjSet
+from tools.get_ilsvrimdb import getI
 
 # different get+dataset+imdb.py has deffernet readAnnotation getNegObjSet and getI functions
 
