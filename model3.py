@@ -102,6 +102,7 @@ class DecoderRNN(nn.Module):
         self.attention = Attention(hidden_size, hidden_size, attention_dim)
         self.vocab_size = vocab_size
         self.init_h = nn.Linear(hidden_size, hidden_size)  # linear layer to find initial cell state of LSTMCell
+        self.init_c = nn.Linear(hidden_size, hidden_size)  # linear layer to find initial cell state of LSTMCell
         self.f_beta = nn.Linear(hidden_size, hidden_size)  # linear layer to create a sigmoid-activated gate
         self.fc = nn.Linear(hidden_size, vocab_size)  # linear layer to find scores over vocabulary
         self.sigmoid = nn.Sigmoid()
@@ -117,13 +118,14 @@ class DecoderRNN(nn.Module):
     
     def init_hidden_state(self, encoder_out):
         """
-        Creates the initial hidden for the decoder's LSTM based on the encoded images.
+        Creates the initial hidden and cell for the decoder's LSTM based on the encoded images.
 
         :param encoder_out: encoded images, a tensor of dimension (batch_size, num_pixels, hidden_size)
-        :return: hidden state
+        :return: hidden and cell state
         """
         mean_encoder_out = encoder_out.mean(dim=1)
         h = self.init_h(mean_encoder_out)  # (batch_size, hidden_size)
+        c = self.init_c(mean_encoder_out)  
         return h
 
     def forward(self, features, captions, lengths):
@@ -135,7 +137,7 @@ class DecoderRNN(nn.Module):
         caption_lengths, sort_ind = lengths.squeeze(1).sort(dim=0, descending=True)
         encoder_out = encoder_out[sort_ind]
         outputs = torch.zeros(features.size(0), self.max_seg_length, self.vocab_size).to(device)
-        h = self.init_hidden_state(encoder_out)      # (batch_size, decoder_dim)
+        h,c = self.init_hidden_state(encoder_out)      # (batch_size, decoder_dim)
 
         # At each time-step, decode by
         # attention-weighing the encoder's output based on the decoder's previous hidden state output
