@@ -167,7 +167,7 @@ class DecoderRNN(nn.Module):
             predictions[:batch_size_t, t, :] = preds
             alphas[:batch_size_t, t, :] = alpha
 
-        return predictions, encoded_captions, decode_lengths, alphas, sort_ind #outputs
+        return predictions, captions, decode_lengths, alphas, sort_ind #outputs
     
     def sample(self, features, states=None):
         """Generate captions for given image features using greedy search."""
