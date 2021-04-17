@@ -92,21 +92,21 @@ class Attention(nn.Module):
 
 
 class DecoderRNN(nn.Module):
-    def __init__(self, attention_dim, decoder_dim, encoder_dim, embed_size, hidden_size, vocab_size, num_layers, max_seq_length=20, dropout=0):
+    def __init__(self, attention_dim, decoder_dim, embed_size, hidden_size, vocab_size, num_layers, max_seq_length=20, dropout=0):
         """Set the hyper-parameters and build the layers."""
         super(DecoderRNN, self).__init__()
         self.embed = nn.Embedding(vocab_size, embed_size)
         self.lstm = nn.LSTM(embed_size, hidden_size, num_layers, batch_first=True)
         self.linear = nn.Linear(hidden_size, vocab_size)
         self.max_seg_length = max_seq_length
-        self.attention = Attention(encoder_dim, decoder_dim, attention_dim)
+        self.attention = Attention(hidden_size, decoder_dim, attention_dim)
         self.vocab_size = vocab_size
-        self.init_h = nn.Linear(encoder_dim, decoder_dim)  # linear layer to find initial cell state of LSTMCell
-        self.init_c = nn.Linear(encoder_dim, decoder_dim)  # linear layer to find initial cell state of LSTMCell
-        self.f_beta = nn.Linear(decoder_dim, encoder_dim)  # linear layer to create a sigmoid-activated gate
+        self.init_h = nn.Linear(hidden_size, decoder_dim)  # linear layer to find initial cell state of LSTMCell
+        self.init_c = nn.Linear(hidden_size, decoder_dim)  # linear layer to find initial cell state of LSTMCell
+        self.f_beta = nn.Linear(decoder_dim, hidden_size)  # linear layer to create a sigmoid-activated gate
         self.fc = nn.Linear(decoder_dim, vocab_size)  # linear layer to find scores over vocabulary
         self.sigmoid = nn.Sigmoid()
-        self.decode_step = nn.LSTMCell(embed_size + encoder_dim, decoder_dim, bias=True)  # decoding LSTMCell
+        self.decode_step = nn.LSTMCell(embed_size + hidden_size, decoder_dim, bias=True)  # decoding LSTMCell
         self.dropout = nn.Dropout(p=dropout)
         self.init_weights()  # initialize some layers with the uniform distribution
 
@@ -122,7 +122,7 @@ class DecoderRNN(nn.Module):
         """
         Creates the initial hidden and cell states for the decoder's LSTM based on the encoded images.
 
-        :param encoder_out: encoded images, a tensor of dimension (batch_size, num_pixels, encoder_dim)
+        :param encoder_out: encoded images, a tensor of dimension (batch_size, num_pixels, hidden_size)
         :return: hidden state, cell state
         """
         mean_encoder_out = encoder_out.mean(dim=1)
@@ -138,9 +138,9 @@ class DecoderRNN(nn.Module):
         # hiddens, _ = self.lstm(packed)
         # outputs = self.linear(hiddens[0])
 
-        encoder_dim = features.size(-1)
+        hidden_size = features.size(-1)
         vocab_size = self.vocab_size
-        encoder_out = features.view(features.size(0), -1, encoder_dim)
+        encoder_out = features.view(features.size(0), -1, hidden_size)
         num_pixels = features.size(1)
         caption_lengths, sort_ind = lengths.squeeze(1).sort(dim=0, descending=True)
         encoder_out = encoder_out[sort_ind]
@@ -158,12 +158,12 @@ class DecoderRNN(nn.Module):
             batch_size_t = sum([l > t for l in decode_lengths])
             attention_weighted_encoding, alpha = self.attention(encoder_out[:batch_size_t],
                                                                 h[:batch_size_t])
-            gate = self.sigmoid(self.f_beta(h[:batch_size_t]))  # gating scalar, (batch_size_t, encoder_dim)
+            gate = self.sigmoid(self.f_beta(h[:batch_size_t]))  # gating scalar, (batch_size_t, hidden_size)
             attention_weighted_encoding = gate * attention_weighted_encoding
             h, c = self.decode_step(
                 torch.cat([embeddings[:batch_size_t, t, :], attention_weighted_encoding], dim=1),
                 (h[:batch_size_t], c[:batch_size_t]))  # (batch_size_t, decoder_dim)
-            preds = self.fc(self.dropout(h))  # (batch_size_t, vocab_size)
+            preds = self.linear(self.dropout(h))  # (batch_size_t, vocab_size)
             predictions[:batch_size_t, t, :] = preds
             alphas[:batch_size_t, t, :] = alpha
 
