@@ -103,6 +103,7 @@ class DecoderRNN(nn.Module):
         self.vocab_size = vocab_size
         self.init_h = nn.Linear(encoder_dim, decoder_dim)  # linear layer to find initial cell state of LSTMCell
         self.init_c = nn.Linear(encoder_dim, decoder_dim)  # linear layer to find initial cell state of LSTMCell
+        self.sigmoid = nn.Sigmoid()
         
     def init_hidden_state(self, encoder_out):
         """
