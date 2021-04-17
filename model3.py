@@ -123,7 +123,7 @@ class DecoderRNN(nn.Module):
         # packed = pack_padded_sequence(embeddings, lengths, batch_first=True) 
         # hiddens, _ = self.lstm(packed)
         # outputs = self.linear(hiddens[0])
-
+        print(features.size(-1))
         encoder_dim = features.size(-1)
         vocab_size = self.vocab_size
         encoder_out = features.view(features.size(0), -1, encoder_dim)
