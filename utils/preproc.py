@@ -22,6 +22,9 @@ def proc(args, mode, root_dir, file_name):
     # General config parameters
     params = config['general']
     crop_size = int(params['crop_size'])
+    encoder_dim = int(params['encoder_dim'])
+    attention_dim = int(params['attention_dim'])
+    decoder_dim = int(params['decoder_dim'])
     embed_size = int(params['embed_size'])
     hidden_size = int(params['hidden_size'])
     num_layers = int(params['num_layers'])
@@ -73,7 +76,7 @@ def proc(args, mode, root_dir, file_name):
     # if os.path.exists(pretrain_path) == False:
     #     os.system(" wget -O " + pretrain_path + " --no-check-certificate " + download_resnet_18_path)
     # Build the models
-    encoder = resnet_18(pretrain_path, int(config['categories'][args.categoryname]), float(config['icnn_args']['dropoutrate']), config['icnn_args']['losstype']) #EncoderCNN(embed_size)
-    decoder = DecoderRNN(embed_size, hidden_size, len(vocab), num_layers)
+    encoder = EncoderCNN(embed_size) #resnet_18(pretrain_path, int(config['categories'][args.categoryname]), float(config['icnn_args']['dropoutrate']), config['icnn_args']['losstype']) #
+    decoder = DecoderRNN(attention_dim, decoder_dim, encoder_dim, embed_size, hidden_size, len(vocab), num_layers)
     
     return encoder, decoder, data_loader, c
