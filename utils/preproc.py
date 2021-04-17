@@ -30,7 +30,7 @@ def proc(args, mode, root_dir, file_name):
     c['learning_rate'] = float(params['learning_rate'])
     c['log_step'] = int(params['log_step'])
     c['num_epochs'] = int(params['num_epochs'])
-
+    c['categories'] = config['categories']
     # Mode-specific parameters
     params = config[mode]
     image_dir = os.path.join(root_dir, params['image_dir'])

@@ -43,7 +43,7 @@ def main():
 			questions = questions.to(device)
 			category  = [category_list[category_id_idx].to(device) for category_list in categories]
 			# Forward, backward and optimize
-			features = encoder(image, category, torch.Tensor([epoch + 1]),torch.mean(torch.from_numpy(np.arange(1,80)).float())) #encoder(images)
+			features = encoder(images, category, torch.Tensor([epoch + 1]),torch.mean(torch.from_numpy(np.arange(1,80)).float())) #encoder(images)
 			# outputs = decoder(features, questions, lengths)
 			loss = criterion(outputs, targets)
 			decoder.zero_grad()
