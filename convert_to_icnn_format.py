@@ -23,14 +23,14 @@ def data_format_converter():
         for line in train_lines:
             if train_lines.index(line) != 0:
                 row = line.split('\t')
-                image_links.append("{0},{1},{2},{3}".format(row[0],f'all_crop/{row[0]}',0,int(categoryid in row[3].split('---'))))
+                image_links.append("{0},{1},{2},{3}".format(row[0],f'all_crop/{row[0]}',0,int(categoryid in [int(c) for c in row[3].split('---')])))
 
         for line in val_lines:
             if val_lines.index(line) != 0:
                 row = line.split('\t')
-                image_links.append("{0},{1},{2},{3}".format(row[0],f'all_crop/{row[0]}',1,int(categoryid in row[3].split('---'))))
+                image_links.append("{0},{1},{2},{3}".format(row[0],f'all_crop/{row[0]}',1,int(categoryid in [int(c) for c in row[3].split('---')])))
 
-        with open(dest_data_path.format(categoryname),'w+') as f:
+        with open(dest_data_path.format(categoryname.lower()),'w+') as f:
             for line in image_links:
                 f.write('{0}\n'.format(line))
 

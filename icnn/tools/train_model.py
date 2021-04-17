@@ -148,8 +148,8 @@ def train_model(taskid_path, args, net, train_dataloader, val_dataloader, densit
             writer.add_scalar('Eval/acc', sum(eval_acc)/ (length*args.label_num), epoch)
         if judge==1 or (epoch+1)%50==0:
             # save
-            # torch.save(net, taskid_path + '/net-' + str(epoch + 1) + '.pkl')
-            #torch.save(net.state_dict(), taskid_path + '/net-params-' + str(epoch + 1) + '.pkl')
+            torch.save(net, taskid_path + '/net-' + str(epoch + 1) + '.pkl')
+            torch.save(net.state_dict(), taskid_path + '/net-params-' + str(epoch + 1) + '.pkl')
             judge=0
 
     return max_acc,max_epoch+1

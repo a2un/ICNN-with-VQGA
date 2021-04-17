@@ -54,7 +54,7 @@ if(args.task_name=='classification'):
     classification(root_path, args)
 else:
     if args.dataset == 'vocpart':
-        args.label_name = ['bird','cat','cow','dog','horse','sheep']
+        args.label_name = ['person','chair','car','dining_table','cup']
         args.label_num = 6
     classification_multi(root_path,args)
 
