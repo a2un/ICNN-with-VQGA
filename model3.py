@@ -132,7 +132,7 @@ class DecoderRNN(nn.Module):
         """Decode image feature vectors and generates captions."""
         embeddings = self.embed(captions)
         embeddings = torch.cat((features.unsqueeze(1), embeddings), 1)
-        # packed = pack_padded_sequence(embeddings, lengths, batch_first=True) 
+        
         # hiddens, _ = self.lstm(packed)
         # outputs = self.linear(hiddens[0])
 
@@ -157,9 +157,10 @@ class DecoderRNN(nn.Module):
                                                                 h[:batch_size_t])
             gate = self.sigmoid(self.f_beta(h[:batch_size_t]))  # gating scalar, (batch_size_t, hidden_size)
             attention_weighted_encoding = gate * attention_weighted_encoding
-            h, c = self.lstm(
+            packed = pack_padded_sequence(
                 torch.cat([embeddings[:batch_size_t, t, :], attention_weighted_encoding], dim=1),
-                (h[:batch_size_t], c[:batch_size_t]))  # (batch_size_t, hidden_size)
+                (h[:batch_size_t], c[:batch_size_t]), batch_first=True) # (batch_size_t, hidden_size)
+            h, c = self.lstm(packed)  
             preds = self.linear(h[0])  # (batch_size_t, vocab_size)
             predictions[:batch_size_t, t, :] = preds
             alphas[:batch_size_t, t, :] = alpha
