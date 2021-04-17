@@ -92,7 +92,7 @@ class Attention(nn.Module):
 
 
 class DecoderRNN(nn.Module):
-    def __init__(self, attention_dim, decoder_dim, encoder_dim, embed_size, hidden_size, vocab_size, num_layers, max_seq_length=20):
+    def __init__(self, attention_dim, decoder_dim, encoder_dim, embed_size, hidden_size, vocab_size, num_layers, max_seq_length=20, dropout=0):
         """Set the hyper-parameters and build the layers."""
         super(DecoderRNN, self).__init__()
         self.embed = nn.Embedding(vocab_size, embed_size)
@@ -107,6 +107,7 @@ class DecoderRNN(nn.Module):
         self.fc = nn.Linear(decoder_dim, vocab_size)  # linear layer to find scores over vocabulary
         self.sigmoid = nn.Sigmoid()
         self.decode_step = nn.LSTMCell(embed_size + encoder_dim, decoder_dim, bias=True)  # decoding LSTMCell
+        self.dropout = nn.Dropout(p=dropout)
         self.init_weights()  # initialize some layers with the uniform distribution
 
     def init_weights(self):
