@@ -101,7 +101,8 @@ class DecoderRNN(nn.Module):
         self.max_seg_length = max_seq_length
         self.attention = Attention(encoder_dim, decoder_dim, attention_dim)
         self.vocab_size = vocab_size
-        self.init_h = nn.Linear(encoder_dim, decoder_dim)
+        self.init_h = nn.Linear(encoder_dim, decoder_dim)  # linear layer to find initial cell state of LSTMCell
+        self.init_c = nn.Linear(encoder_dim, decoder_dim)  # linear layer to find initial cell state of LSTMCell
         
     def init_hidden_state(self, encoder_out):
         """
