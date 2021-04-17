@@ -103,8 +103,19 @@ class DecoderRNN(nn.Module):
         self.vocab_size = vocab_size
         self.init_h = nn.Linear(encoder_dim, decoder_dim)  # linear layer to find initial cell state of LSTMCell
         self.init_c = nn.Linear(encoder_dim, decoder_dim)  # linear layer to find initial cell state of LSTMCell
+        self.f_beta = nn.Linear(decoder_dim, encoder_dim)  # linear layer to create a sigmoid-activated gate
+        self.fc = nn.Linear(decoder_dim, vocab_size)  # linear layer to find scores over vocabulary
         self.sigmoid = nn.Sigmoid()
-        
+        self.init_weights()  # initialize some layers with the uniform distribution
+
+    def init_weights(self):
+        """
+        Initializes some parameters with values from the uniform distribution, for easier convergence.
+        """
+        self.embedding.weight.data.uniform_(-0.1, 0.1)
+        self.fc.bias.data.fill_(0)
+        self.fc.weight.data.uniform_(-0.1, 0.1)    
+    
     def init_hidden_state(self, encoder_out):
         """
         Creates the initial hidden and cell states for the decoder's LSTM based on the encoded images.
