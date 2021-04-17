@@ -114,7 +114,7 @@ class DecoderRNN(nn.Module):
         vocab_size = self.vocab_size
         encoder_out = features.view(features.size(0), -1, encoder_dim)
         num_pixels = features.size(1)
-        caption_lengths, sort_ind = caption_lengths.squeeze(1).sort(dim=0, descending=True)
+        caption_lengths, sort_ind = lenghths.squeeze(1).sort(dim=0, descending=True)
         encoder_out = encoder_out[sort_ind]
         decode_lengths = (caption_lengths - 1).tolist()
 
