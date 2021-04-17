@@ -99,7 +99,7 @@ class DecoderRNN(nn.Module):
         self.lstm = nn.LSTM(embed_size, hidden_size, num_layers, batch_first=True)
         self.linear = nn.Linear(hidden_size, vocab_size)
         self.max_seg_length = max_seq_length
-        self.attention = Attnetion(encoder_dim, decoder_dim, attention_dim)
+        self.attention = Attention(encoder_dim, decoder_dim, attention_dim)
         
     def forward(self, features, captions, lengths):
         """Decode image feature vectors and generates captions."""
