@@ -136,9 +136,8 @@ class DecoderRNN(nn.Module):
         # hiddens, _ = self.lstm(packed)
         # outputs = self.linear(hiddens[0])
 
-        hidden_size = features.size(-1)
         vocab_size = self.vocab_size
-        encoder_out = features.view(features.size(0), -1, hidden_size)
+        encoder_out = features.view(features.size(0), -1, features.size(-1))
         num_pixels = features.size(1)
         caption_lengths, sort_ind = lengths.squeeze(1).sort(dim=0, descending=True)
         encoder_out = encoder_out[sort_ind]
