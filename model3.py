@@ -100,6 +100,7 @@ class DecoderRNN(nn.Module):
         self.linear = nn.Linear(hidden_size, vocab_size)
         self.max_seg_length = max_seq_length
         self.attention = Attention(encoder_dim, decoder_dim, attention_dim)
+        self.vocab_size = vocab_size
         
     def forward(self, features, captions, lengths):
         """Decode image feature vectors and generates captions."""
