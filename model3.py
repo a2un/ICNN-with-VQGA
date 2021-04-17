@@ -102,7 +102,6 @@ class DecoderRNN(nn.Module):
         self.attention = Attention(hidden_size, hidden_size, attention_dim)
         self.vocab_size = vocab_size
         self.init_h = nn.Linear(hidden_size, hidden_size)  # linear layer to find initial cell state of LSTMCell
-        self.init_c = nn.Linear(hidden_size, hidden_size)  # linear layer to find initial cell state of LSTMCell
         self.f_beta = nn.Linear(hidden_size, hidden_size)  # linear layer to create a sigmoid-activated gate
         self.fc = nn.Linear(hidden_size, vocab_size)  # linear layer to find scores over vocabulary
         self.sigmoid = nn.Sigmoid()
@@ -118,14 +117,13 @@ class DecoderRNN(nn.Module):
     
     def init_hidden_state(self, encoder_out):
         """
-        Creates the initial hidden and cell states for the decoder's LSTM based on the encoded images.
+        Creates the initial hidden for the decoder's LSTM based on the encoded images.
 
         :param encoder_out: encoded images, a tensor of dimension (batch_size, num_pixels, hidden_size)
-        :return: hidden state, cell state
+        :return: hidden state
         """
         mean_encoder_out = encoder_out.mean(dim=1)
         h = self.init_h(mean_encoder_out)  # (batch_size, hidden_size)
-        c = self.init_c(mean_encoder_out)
         return h, c
 
     def forward(self, features, captions, lengths):
@@ -133,9 +131,6 @@ class DecoderRNN(nn.Module):
         embeddings = self.embed(captions)
         embeddings = torch.cat((features.unsqueeze(1), embeddings), 1)
         
-        # hiddens, _ = self.lstm(packed)
-        # outputs = self.linear(hiddens[0])
-
         vocab_size = self.vocab_size
         encoder_out = features.view(features.size(0), -1, features.size(-1))
         num_pixels = features.size(1)
@@ -143,29 +138,16 @@ class DecoderRNN(nn.Module):
         encoder_out = encoder_out[sort_ind]
         decode_lengths = (caption_lengths - 1).tolist()
 
-        h, c = self.init_hidden_state(encoder_out)
+        h = self.init_hidden_state(encoder_out)      # (batch_size, decoder_dim)
         # Create tensors to hold word predicion scores and alphas
         predictions = torch.zeros(features.size(0), int(max(decode_lengths)), vocab_size).to(device)
-        alphas = torch.zeros(features.size(0), int(max(decode_lengths)), num_pixels).to(device)
-        
-        # At each time-step, decode by
-        # attention-weighing the encoder's output based on the decoder's previous hidden state output
-        # then generate a new word in the decoder with the previous word and the attention weighted encoding
-        for t in range(int(max(decode_lengths))):
-            batch_size_t = sum([l > t for l in decode_lengths])
-            attention_weighted_encoding, alpha = self.attention(encoder_out[:batch_size_t],
-                                                                h[:batch_size_t])
-            gate = self.sigmoid(self.f_beta(h[:batch_size_t]))  # gating scalar, (batch_size_t, hidden_size)
-            attention_weighted_encoding = gate * attention_weighted_encoding
-            packed = pack_padded_sequence(
-                torch.cat([embeddings[:batch_size_t, t, :], attention_weighted_encoding], dim=1),
-                (h[:batch_size_t], c[:batch_size_t]), batch_first=True) # (batch_size_t, hidden_size)
-            h, c = self.lstm(packed)  
-            preds = self.linear(h[0])  # (batch_size_t, vocab_size)
-            predictions[:batch_size_t, t, :] = preds
-            alphas[:batch_size_t, t, :] = alpha
 
-        return predictions, captions, decode_lengths, alphas, sort_ind #outputs
+        attention_weighted_encoding, _ = self.attention(encoder_out[:batch_size_t], h[:batch_size_t])
+        packed = pack_padded_sequence(torch.cat([embeddings[:batch_size_t, t, :], attention_weighted_encoding], dim=1), lengths, batch_first=True) 
+        hiddens, _ = self.lstm(packed)
+        outputs = self.linear(hiddens[0])
+
+        return outputs
     
     def sample(self, features, states=None):
         """Generate captions for given image features using greedy search."""
