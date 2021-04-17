@@ -44,7 +44,7 @@ def main():
 			questions = questions.to(device)
 			category = np.array([category_list[category_id_idx] for category_list in categories])
 			category  = torch.from_numpy(category.reshape((1,category.shape[0],1,1))).to(device)
-			lengths = torch.Tensor(np.array(lengths).reshape((len(lengths),1))))
+			lengths = torch.Tensor(np.array(lengths).reshape((len(lengths),1)))
 			# Forward, backward and optimize
 			features = encoder(images) #encoder(Variable(images), category, torch.Tensor([epoch + 1]),torch.mean(torch.from_numpy(np.arange(1,80)).float())) #encoder(images)
 			outputs, encoded_captions, decode_lengths, alphas, sort_ind = decoder(features, questions, lengths)
