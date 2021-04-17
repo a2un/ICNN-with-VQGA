@@ -42,7 +42,8 @@ def main():
 			# for image, category_list, question in zip(images, categories, questions):		
 			images = images.to(device)
 			questions = questions.to(device)
-			category  = torch.from_numpy(np.array([category_list[category_id_idx] for category_list in categories])).to(device)
+			category = np.array([category_list[category_id_idx] for category_list in categories])
+			category  = torch.from_numpy(category.reshape((category.shape[0],1))).to(device)
 			# Forward, backward and optimize
 			features = encoder(Variable(images), category, torch.Tensor([epoch + 1]),torch.mean(torch.from_numpy(np.arange(1,80)).float())) #encoder(images)
 			# outputs = decoder(features, questions, lengths)
