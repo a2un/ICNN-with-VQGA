@@ -134,7 +134,7 @@ class DecoderRNN(nn.Module):
 
         h, c = self.init_hidden_state(encoder_out)
         # Create tensors to hold word predicion scores and alphas
-        predictions = torch.zeros(features.size(0), int(max(decode_lengths), vocab_size).to(device)
+        predictions = torch.zeros(features.size(0), int(max(decode_lengths)), vocab_size).to(device)
         alphas = torch.zeros(features.size(0), int(max(decode_lengths)), num_pixels).to(device)
         
         # At each time-step, decode by
