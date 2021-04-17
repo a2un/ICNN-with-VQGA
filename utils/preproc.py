@@ -21,7 +21,6 @@ def proc(args, mode, root_dir, file_name):
     params = config['general']
     crop_size = int(params['crop_size'])
     attention_dim = int(params['attention_dim'])
-    decoder_dim = int(params['decoder_dim'])
     embed_size = int(params['embed_size'])
     hidden_size = int(params['hidden_size'])
     num_layers = int(params['num_layers'])
