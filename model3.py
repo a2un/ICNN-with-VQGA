@@ -130,22 +130,33 @@ class DecoderRNN(nn.Module):
         """Decode image feature vectors and generates captions."""
         embeddings = self.embed(captions)
         embeddings = torch.cat((features.unsqueeze(1), embeddings), 1)
-        
-        vocab_size = self.vocab_size
         encoder_out = features.view(features.size(0), -1, features.size(-1))
         num_pixels = features.size(1)
         caption_lengths, sort_ind = lengths.squeeze(1).sort(dim=0, descending=True)
         encoder_out = encoder_out[sort_ind]
-        decode_lengths = (caption_lengths - 1).tolist()
-
+        outputs = torch.zeros(features.size(0), self.max_seg_length, self.vocab_size).to(device)
         h = self.init_hidden_state(encoder_out)      # (batch_size, decoder_dim)
-        # Create tensors to hold word predicion scores and alphas
-        predictions = torch.zeros(features.size(0), int(max(decode_lengths)), vocab_size).to(device)
 
+        # At each time-step, decode by
+        # attention-weighing the encoder's output based on the decoder's previous hidden state output
+        # then generate a new word in the decoder with the previous word and the attention weighted encoding
+        for t in range(self.max_seg_length):
+            batch_size_t = sum([l > t for l in lengths])
+            attention_weighted_encoding, alpha = self.attention(encoder_out[:batch_size_t],
+                                                                h[:batch_size_t])
+            gate = self.sigmoid(self.f_beta(h[:batch_size_t]))  # gating scalar, (batch_size_t, encoder_dim)
+            attention_weighted_encoding = gate * attention_weighted_encoding
+            h, _ = self.lstm(
+                torch.cat([embeddings[:batch_size_t, t, :], attention_weighted_encoding], dim=1),
+                (h[:batch_size_t], c[:batch_size_t]))  # (batch_size_t, decoder_dim)
+            preds = self.lstm(self.dropout(h))  # (batch_size_t, vocab_size)
+            outputs[:batch_size_t, t, :] = preds
+
+        # Create tensors to hold word predicion scores and alphas
         attention_weighted_encoding, _ = self.attention(encoder_out[:batch_size_t], h[:batch_size_t])
         packed = pack_padded_sequence(torch.cat([embeddings[:batch_size_t, t, :], attention_weighted_encoding], dim=1), lengths, batch_first=True) 
         hiddens, _ = self.lstm(packed)
-        outputs = self.linear(hiddens[0])
+         = self.linear(hiddens[0])
 
         return outputs
     
