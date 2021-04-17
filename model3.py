@@ -126,7 +126,7 @@ class DecoderRNN(nn.Module):
         mean_encoder_out = encoder_out.mean(dim=1)
         h = self.init_h(mean_encoder_out)  # (batch_size, hidden_size)
         c = self.init_c(mean_encoder_out)  
-        return h
+        return h,c
 
     def forward(self, features, captions, lengths):
         """Decode image feature vectors and generates captions."""
