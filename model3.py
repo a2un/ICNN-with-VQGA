@@ -102,6 +102,7 @@ class DecoderRNN(nn.Module):
         """Decode image feature vectors and generates captions."""
         # embeddings = self.embed(captions)
         embeddings = self.embed(captions)
+        print(embeddings.size(),features.unsqueeze(1).size())
         embeddings = torch.cat((features.unsqueeze(1), embeddings), 1)
         packed = pack_padded_sequence(embeddings, lengths.flatten(), batch_first=True, enforce_sorted=False) 
         self.h, self.c = self.lstm(packed)
