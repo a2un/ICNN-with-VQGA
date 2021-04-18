@@ -122,6 +122,8 @@ class DecoderRNN(nn.Module):
         """Decode image feature vectors and generates captions."""
         # embeddings = self.embed(captions)
         # embeddings = torch.cat((features.unsqueeze(1), embeddings), 1)
+        features = features.to(device)
+        captions = captions.to(device)
         batch_size = features.size(0)
         embed_size = features.size(-1)
         vocab_size = self.vocab_size
