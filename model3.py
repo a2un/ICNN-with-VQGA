@@ -134,7 +134,7 @@ class DecoderRNN(nn.Module):
         print(features.size())
         embeddings = torch.cat((features.unsqueeze(1), embeddings), 1)
         outputs = torch.zeros(features.size(0), self.max_seg_length, self.vocab_size).to(device)
-        h,c = self.init_hidden_state(features.view(-1,features.size(1)))              # (batch_size, decoder_dim)
+        h,c = self.init_hidden_state(features.view(-1,embeddings.size(0)))              # (batch_size, decoder_dim)
 
         # At each time-step, decode by
         # attention-weighing the encoder's output based on the decoder's previous hidden state output
