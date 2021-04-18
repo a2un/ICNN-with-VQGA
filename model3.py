@@ -102,9 +102,9 @@ class DecoderRNN(nn.Module):
         self.max_seg_length = max_seq_length
         self.attention = Attention(hidden_size, hidden_size, attention_dim)
         self.vocab_size = vocab_size
-        self.init_h = nn.Linear(hidden_size, hidden_size)  # linear layer to find initial cell state of LSTMCell
-        self.init_c = nn.Linear(hidden_size, hidden_size)  # linear layer to find initial cell state of LSTMCell
-        self.f_beta = nn.Linear(hidden_size, hidden_size)  # linear layer to create a sigmoid-activated gate
+        self.init_h = nn.Linear(embed_size, hidden_size)  # linear layer to find initial cell state of LSTMCell
+        self.init_c = nn.Linear(embed_size, hidden_size)  # linear layer to find initial cell state of LSTMCell
+        self.f_beta = nn.Linear(embed_size, hidden_size)  # linear layer to create a sigmoid-activated gate
         self.fc = nn.Linear(hidden_size, vocab_size)  # linear layer to find scores over vocabulary
         self.sigmoid = nn.Sigmoid()
         self.init_weights()  # initialize some layers with the uniform distribution
@@ -121,7 +121,7 @@ class DecoderRNN(nn.Module):
         """
         Creates the initial hidden and cell for the decoder's LSTM based on the encoded images.
 
-        :param encoder_out: encoded images, a tensor of dimension (batch_size, num_pixels, hidden_size)
+        :param encoder_out: encoded images, a tensor of dimension (batch_size, embed_size)
         :return: hidden and cell state
         """
         mean_encoder_out = encoder_out.mean(dim=1)
