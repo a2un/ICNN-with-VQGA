@@ -3,6 +3,7 @@ from model3 import EncoderCNN, DecoderRNN
 from torchvision import transforms
 from utils.vocab import Vocabulary
 from utils.data_loader import get_loader
+from icnn_resnet_18.resnet_18 import resnet_18
 
 def proc(args, mode, root_dir, file_name):
 
@@ -65,7 +66,7 @@ def proc(args, mode, root_dir, file_name):
     # Build data loader
     data_loader = get_loader(image_dir, data_file_path, q_data_set, vocab, transform, batch_size, True, num_workers)
 
-    model_path = os.path.join(root_dir, 'models/resnet_18')
+    model_path = os.path.join(root_dir, 'icnn_resnet_18')
     # download_resnet_18_path = "https://download.pytorch.org/models/resnet18-f37072fd.pth"
     pretrain_path = os.path.join(model_path, f"resnet18-f37072fd.pth")
     # if os.path.exists(pretrain_path) == False:

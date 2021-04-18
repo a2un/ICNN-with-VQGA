@@ -1,23 +1,32 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-import torchvision.models as models
+import torchvision.model.resnet as resnet
+from torchvision.models.utils import load_state_dict_from_url
 from torch.nn.utils.rnn import pack_padded_sequence
 
 # Device configuration
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
-class EncoderCNN(nn.Module):
-    def __init__(self, embed_size):
-        """Load the pretrained ResNet-152 and replace top fc layer."""
-        super(EncoderCNN, self).__init__()
-        #resnet = models.inception_v3(pretrained=True)
-        resnet = models.resnet18(pretrained=True)
-        self.modules = list(resnet.children())[:-1]      # delete the last fc layer.
-        for i in range(len(self.modules)):
-            self.modules[i] = self.modules[i].to(device)
-        self.linear = nn.Linear(2048, embed_size)
-        self.bn = nn.BatchNorm1d(embed_size, momentum=0.01)
+class SaveFeatures:
+    def __init__(self, module):
+        self.hook = module.register_forward_hook(self.hook_fn)
+    def hook_fn(self, module, input, output):
+        self.features = output.clone().detach()
+    def close(self):
+        self.hook.remove()
+
+# This is a simple model that returns that last fully-connected layer of a Resnet 18 CNN      
+class EncoderCNN(resnet.ResNet):
+    def __init__(self):
+        super().__init__(resnet.BasicBlock, [2, 2, 2, 2])
+        state_dict = load_state_dict_from_url(resnet.model_urls['resnet18'], progress=True)
+        self.load_state_dict(state_dict)
+        self.activation = SaveFeatures(list(self.children())[-1])
+     
+    def __call__(self, inputs):
+        super().__call__(torch.unsqueeze(inputs,0))
+        return self.activation.features
         
     def forward(self, images):
         """Extract feature vectors from input images."""
@@ -114,16 +123,15 @@ class DecoderRNN(nn.Module):
     def forward(self, features, captions, lengths):
         """Decode image feature vectors and generates captions."""
         # embeddings = self.embed(captions)
-        # embeddings = torch.cat((features.unsqueeze(1), embeddings), 1)
         embeddings = self.embed(captions)
-        # embeddings = torch.cat((features.unsqueeze(1), embeddings), 1)
+        embeddings = torch.cat((features.unsqueeze(1), embeddings), 1)
         packed = pack_padded_sequence(embeddings, lengths.flatten(), batch_first=True, enforce_sorted=False) 
         self.h, self.c = self.lstm(packed)
-        print(self.h[0].size())
-        encoder_out = features.view(features.size(0), -1, features.size(1))
-        attention_weighted_encoding = self.attention(encoder_out, self.h[0])
-        print("hidden size",attention_weighted_encoding.squeeze(2).size())
-        outputs = self.linear(torch.transpose(attention_weighted_encoding.squeeze(2),0,1))
+        # print(self.h[0].size())
+        # encoder_out = features.view(features.size(0), -1, features.size(1))
+        attention_weighted_encoding = self.h[0] #self.attention(encoder_out, self.h[0])
+        # print("hidden size",attention_weighted_encoding.squeeze(2).size())
+        outputs = self.linear(attention_weighted_encoding)
         return outputs
     
     def sample(self, features, states=None):
