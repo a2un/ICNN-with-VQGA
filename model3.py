@@ -104,6 +104,7 @@ class DecoderRNN(nn.Module):
         self.f_beta = nn.Linear(hidden_size, embed_size)  # linear layer to create a sigmoid-activated gate
         self.hidden_size = hidden_size
         self.vocab_size = vocab_size
+        self.sigmoid = nn.Sigmoid()
         
     def forward(self, features, captions, lengths):
         """Decode image feature vectors and generates captions."""
