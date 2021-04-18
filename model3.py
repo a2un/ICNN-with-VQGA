@@ -83,11 +83,11 @@ class Attention(nn.Module):
         :return: attention weighted encoding, weights
         """
         att1 = self.encoder_att(encoder_out)  # (batch_size, embed_size)
-        att2 = self.decoder_att(decoder_hidden)  # (batch_size, hidden_size)
-        print("attention encoder",att1.size(),"attention decoder",att2.size())
-        att = self.full_att(self.relu(att1 + att2)).squeeze(0)  # (batch_size, embed_size)
-        alpha = self.softmax(att)  # (batch_size, embed_size)
-        attention_weighted_encoding = (encoder_out * alpha.unsqueeze(2)).sum(dim=1)  # (batch_size, embed_size)
+        # att2 = self.decoder_att(decoder_hidden)  # (batch_size, hidden_size)
+        print("attention encoder",att1.size())
+        # att = self.full_att(self.relu(att1)).squeeze(0)  # (batch_size, embed_size)
+        alpha = self.softmax(att1)  # (batch_size, embed_size)
+        attention_weighted_encoding = (encoder_out * alpha).sum(dim=1)  # (batch_size, embed_size)
 
         return attention_weighted_encoding
 
@@ -133,11 +133,7 @@ class DecoderRNN(nn.Module):
         print("caption embedding size",embeddings.size(),"attention size",attention_weighted_encoding.size())
         input = torch.cat([embeddings,attention_weighted_encoding])
         input = input.view(input.size(0),-1,input.size(1))
-        hidden = torch.cat([self.h,self.c])
-        hidden = hidden.view(1,hidden.size(0),hidden.size(1))
-        print("hidden/current before",self.h.size(),self.c.size(),"concat hidden size",hidden.size())
-        self.h, self.c = self.lstm(input, (hidden))
-        print("hidden/current after",self.h.size(),self.c.size())
+        self.h, self.c = self.lstm(input, (self.h.unsqueeze(0),self.c.unsqueeze(0)))
         outputs = self.linear(self.h)
         print("output size",outputs.size(),"hidden size",self.h.size())
         return outputs
