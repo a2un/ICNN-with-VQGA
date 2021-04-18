@@ -101,8 +101,6 @@ class DecoderRNN(nn.Module):
         self.max_seg_length = max_seq_length
         self.attention = Attention(embed_size, hidden_size, attention_dim)
         self.vocab_size = vocab_size
-        self.init_h = nn.Linear(embed_size, hidden_size)  # linear layer to find initial cell state of LSTMCell
-        self.init_c = nn.Linear(embed_size, hidden_size)  # linear layer to find initial cell state of LSTMCell
         self.f_beta = nn.Linear(embed_size, hidden_size)  # linear layer to create a sigmoid-activated gate
         self.fc = nn.Linear(hidden_size, vocab_size)  # linear layer to find scores over vocabulary
         self.sigmoid = nn.Sigmoid()
@@ -122,23 +120,17 @@ class DecoderRNN(nn.Module):
 
         embeddings = torch.cat((features.unsqueeze(1), embeddings), 1)
         outputs = torch.zeros(features.size(0), self.max_seg_length, self.vocab_size).to(device)
+        h = self.fc(embeddings.mean(dim=1))  
 
         # At each time-step, decode by
         # attention-weighing the encoder's output based on the decoder's previous hidden state output
         # then generate a new word in the decoder with the previous word and the attention weighted encoding
-        for t in range(self.max_seg_length-1):
-            batch_size_t = sum([l > t for l in lengths])
-            attention_weighted_encoding, alpha = self.attention(embeddings[:batch_size_t],
-                                                                h[:batch_size_t])
-            gate = self.sigmoid(self.f_beta(h[:batch_size_t]))  # gating scalar, (batch_size_t, encoder_dim)
-            attention_weighted_encoding = gate * attention_weighted_encoding
-
-            packed = pack_padded_sequence(torch.cat([embeddings[:batch_size_t, t, :], attention_weighted_encoding], dim=1), lengths.cpu().flatten(), batch_first=True,enforce_sorted=False) 
-            
-            h, _ = self.lstm(packed)  # (batch_size_t, decoder_dim)
-            preds = self.fc(h)  # (batch_size_t, vocab_size)
-            outputs[:batch_size_t, t, :] = preds
-
+        attention_weighted_encoding, alpha = self.attention(embeddings,h)
+        gate = self.sigmoid(self.f_beta(h))  # gating scalar, (batch_size_t, encoder_dim)
+        attention_weighted_encoding = gate * attention_weighted_encoding
+        packed = pack_padded_sequence(torch.cat([embeddings, attention_weighted_encoding], dim=1), lengths.cpu().flatten(), batch_first=True,enforce_sorted=False) 
+        h, _ = self.lstm(packed)  # (batch_size_t, decoder_dim)
+        outputs = self.fc(h[0])  # (batch_size_t, vocab_size)
         return outputs
     
     def sample(self, features, states=None):
