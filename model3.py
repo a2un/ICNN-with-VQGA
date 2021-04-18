@@ -85,22 +85,22 @@ class Attention(nn.Module):
         att1 = self.encoder_att(encoder_out)  #(128, -1, 16)                  # (batch_size, -1, embed_size)
         att2 = self.decoder_att(decoder_hidden)      #(1170,16)            # (vocab_size, hidden_size)
         print("attention encoder",att1.size(), "attention decoder", att2.size())
-        att = self.full_att((att1 + att2).permute(1,2,0))
-        print("full attention", (att1 + att2).size())                      # (batch_size, hidden_size)
+        att = self.full_att(att1 + att2)
+        print("full attention", att.size())                      # (batch_size, hidden_size)
         # alpha = self.softmax(att)                                 # (hidden_size, 1)
         attention_weighted_encoding = (att * encoder_out.mean())#.sum()  #  (batch_size, hidden_size)
 
         return attention_weighted_encoding
 
 class DecoderRNN(nn.Module):
-    def __init__(self, embed_size, hidden_size, vocab_size, num_layers, max_seq_length=20):
+    def __init__(self, embed_size, hidden_size, batch_size, vocab_size, num_layers, max_seq_length=20):
         """Set the hyper-parameters and build the layers."""
         super(DecoderRNN, self).__init__()
         self.embed = nn.Embedding(vocab_size, embed_size)
         self.lstm = nn.LSTM(embed_size, hidden_size, num_layers, batch_first=True)
         self.linear = nn.Linear(hidden_size, vocab_size)
         self.max_seg_length = max_seq_length
-        self.attention = Attention(embed_size,hidden_size,hidden_size)
+        self.attention = Attention(embed_size,hidden_size,batch_size)
         self.init_h = nn.Linear(embed_size,hidden_size)
         self.init_c = nn.Linear(embed_size,hidden_size)
         self.h = None
