@@ -37,7 +37,7 @@ def main():
 
 	# Loss and optimizer
 	criterion = nn.CrossEntropyLoss()
-	params = list(decoder.parameters())
+	params = list(decoder.parameters()) #+ list(encoder.linear.parameters()) + list(encoder.bn.parameters())
 	optimizer = torch.optim.Adam(params, lr=config['learning_rate'])
 
 	# Train the models
