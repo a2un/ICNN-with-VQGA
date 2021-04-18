@@ -87,7 +87,7 @@ class Attention(nn.Module):
         print("attention encoder",att1.size())
         # att = self.full_att(self.relu(att1)).squeeze(0)  # (batch_size, embed_size)
         alpha = self.softmax(att1)  # (batch_size, embed_size)
-        attention_weighted_encoding = (encoder_out * alpha.unsqueeze(2)).sum(dim=1)  # (batch_size, embed_size)
+        attention_weighted_encoding = (encoder_out * alpha).sum(dim=1)  # (batch_size, embed_size)
 
         return attention_weighted_encoding
 
@@ -129,7 +129,7 @@ class DecoderRNN(nn.Module):
         attention_weighted_encoding = self.attention(features, self.h)
         # gate = self.sigmoid(self.f_beta(features))
         # attention_weighted_encoding = gate * attention_weighted_encoding
-        embeddings = embeddings.mean(dim=1)
+        embeddings = embeddings.mean(dim=1).mean(dim=1)
         print("caption embedding size",embeddings.size(),"attention size",attention_weighted_encoding.size())
         input = torch.cat([embeddings,attention_weighted_encoding])
         input = input.view(input.size(0),-1,input.size(1))
