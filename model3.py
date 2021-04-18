@@ -121,7 +121,7 @@ class DecoderRNN(nn.Module):
 
         for t in range(int(max(decode_lengths))):
             batch_size_t = sum([l > t for l in decode_lengths])
-            attention_weighted_encoding = self.attention(embeddings,h[0])
+            attention_weighted_encoding = self.attention(embeddings[:batch_size_t,:,:],h[0])
             gate = self.sigmoid(self.f_beta(h))  # gating scalar, (batch_size_t, encoder_dim)
             attention_weighted_encoding = gate * attention_weighted_encoding
             print(gate.size(), attention_weighted_encoding.size())
