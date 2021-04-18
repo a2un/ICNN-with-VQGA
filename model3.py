@@ -97,7 +97,7 @@ class DecoderRNN(nn.Module):
         super(DecoderRNN, self).__init__()
         self.embed = nn.Embedding(vocab_size, embed_size)
         self.lstm = nn.LSTM(embed_size, hidden_size, num_layers, batch_first=True)
-        self.decode_step = nn.LSTMCell(embed_dim + hidden_size, hidden_size, bias=True)  # decoding LSTMCell
+        self.decode_step = nn.LSTMCell(embed_size + hidden_size, hidden_size, bias=True)  # decoding LSTMCell
         self.linear = nn.Linear(hidden_size, vocab_size)
         self.max_seg_length = max_seq_length
         self.attention = Attention(hidden_size, hidden_size, attention_dim)
