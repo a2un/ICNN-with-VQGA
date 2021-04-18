@@ -131,7 +131,7 @@ class DecoderRNN(nn.Module):
             input = torch.cat([embeddings[:batch_size_t,t,:], attention_weighted_encoding])
             print(input.view(input.size(0),-1,input.size(1)).size())
             h, _ = self.lstm(input.view(input.size(0),-1,input.size(1)),
-                            h)
+                            h.unsqueeze(0))
             outputs[:batch_size_t,t] = self.linear(h.squeeze(0))
         
         return outputs
