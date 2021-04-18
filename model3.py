@@ -129,7 +129,7 @@ class DecoderRNN(nn.Module):
                 #     h[:batch_size_t], c[:batch_size_t]], dim=1),
                 lengths, batch_first=True) 
             h, c = self.lstm(packed)
-            outputs[:batch_size_t,t] = self.linear(h)
+            outputs[:batch_size_t,t] = self.linear(h[0])
         
         return outputs
     
