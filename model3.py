@@ -127,7 +127,7 @@ class DecoderRNN(nn.Module):
         embeddings = self.embed(captions)
         self.init_hidden_state(nn.Linear(embed_size,self.hidden_size).to(device)(features).to(device))
         attention_weighted_encoding = self.attention(features, self.h)
-        gate = self.sigmoid(self.f_beta(self.h))
+        gate = self.sigmoid(self.f_beta(features))
         attention_weighted_encoding = gate * attention_weighted_encoding
         embeddings = embeddings.mean(dim=1)
         print("caption embedding size",embeddings.size(),"attention size",attention_weighted_encoding.size())
