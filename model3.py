@@ -4,6 +4,7 @@ import torch.nn.functional as F
 import torchvision.models.resnet as resnet
 from torchvision.models.utils import load_state_dict_from_url
 from torch.nn.utils.rnn import pack_padded_sequence
+from icnn_resnet_18.resnet_18 import resnet_18
 
 # Device configuration
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
@@ -27,43 +28,20 @@ class EncoderCNN(resnet.ResNet):
     def __call__(self, inputs):
         super().__call__(torch.unsqueeze(inputs,0))
         return self.activation.features
-        
-    def forward(self, images):
-        """Extract feature vectors from input images."""
-        with torch.no_grad():
-        
-            """ This was the set-up from the inception_v3 model
-            x = self.modules[0](images)
-            x = self.modules[1](x)
-            x = self.modules[2](x)
-            x = F.max_pool2d(x, kernel_size=3, stride=2)
-            x = self.modules[3](x)
-            x = self.modules[4](x)
-            x = F.max_pool2d(x, kernel_size=3, stride=2)
-            x = self.modules[5](x)
-            x = self.modules[6](x)
-            x = self.modules[7](x)
-            x = self.modules[8](x)
-            x = self.modules[9](x)
-            x = self.modules[10](x)
-            x = self.modules[11](x)
-            x = self.modules[12](x)
-            x = self.modules[14](x)
-            x = self.modules[15](x)
-            x = self.modules[16](x)
-            x = F.avg_pool2d(x, kernel_size=8)
-            x = x.view(x.size(0), -1)    
-            """
-            
-            x = self.modules[0](images)
-            x = F.max_pool2d(x, kernel_size=3, stride=2)
-            for i in range(1,len(self.modules)-1):	# I cut off the last layer because it was reducing the size of the matrix to 1x1
-                x = self.modules[i](x)
-            x = F.avg_pool2d(x, kernel_size=2)
-            x = x.view(x.size(0), -1)
-            
-        features = self.bn(self.linear(x))
-        return features
+    
+    # Pass a list of ints representing the modules of the encoder for which you want to extract features
+    def create_forward_hooks(self, layer_list):
+        modules = list(self.modules())
+        self.activations = {i: SaveFeatures(modules[i]) for i in layer_list}
+    
+    # Pass the int value of the layer for which you want a feature map.  Only call this after passing 
+    # inputs to the encoder and you will get the output associated with those inputs
+    def extract_layer_features(self, layer):
+        return self.activations[layer].features
+    
+    def close_forward_hooks(self):
+        for activation in self.activations.values():
+            activation.close()
 
 class Attention(nn.Module):
     """
