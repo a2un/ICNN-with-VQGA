@@ -82,10 +82,11 @@ class Attention(nn.Module):
         :param decoder_hidden: previous decoder output, a tensor of dimension (batch_size, hidden_size)
         :return: attention weighted encoding, weights
         """
-        att1 = self.encoder_att(encoder_out)                    # (batch_size, -1, embed_size)
-        att2 = self.decoder_att(decoder_hidden)                 # (batch_size, hidden_size)
+        att1 = self.encoder_att(encoder_out)  #(128, -1, 16)                  # (batch_size, -1, embed_size)
+        att2 = self.decoder_att(decoder_hidden)      #(1170,16)            # (batch_size, hidden_size)
         print("attention encoder",att1.size(), "attention decoder", att2.size())
-        att = self.full_att(att1 + att2)                          # (batch_size, hidden_size)
+        att = self.full_att(att1 + att2)    
+        print("full attention", att.size())                      # (batch_size, hidden_size)
         # alpha = self.softmax(att)                                 # (hidden_size, 1)
         attention_weighted_encoding = (att * encoder_out.mean())#.sum()  #  (batch_size, hidden_size)
 
@@ -120,9 +121,6 @@ class DecoderRNN(nn.Module):
         print(self.h[0].size())
         encoder_out = features.view(features.size(0), -1, features.size(1))
         attention_weighted_encoding = self.attention(encoder_out, self.h[0])
-        gate = self.h[0]                 # (hidden_size, 1)
-        print("attention size", attention_weighted_encoding.size(), "gate size", gate.size())                                  
-        # attention_weighted_encoding = attention_weighted_encoding * gate            # (batch_size, hidden_size)
         print("hidden size",attention_weighted_encoding.squeeze(2).size())
         outputs = self.linear(torch.transpose(attention_weighted_encoding.squeeze(2),0,1))
         return outputs
