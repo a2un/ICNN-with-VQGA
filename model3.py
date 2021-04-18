@@ -145,6 +145,7 @@ class DecoderRNN(nn.Module):
         # then generate a new word in the decoder with the previous word and the attention weighted encoding
         for t in range(self.max_seg_length-1):
             batch_size_t = sum([l > t for l in lengths])
+            print(encoder_out.size(),h.size(),c.size())
             attention_weighted_encoding, alpha = self.attention(encoder_out[:batch_size_t],
                                                                 h[:batch_size_t])
             gate = self.sigmoid(self.f_beta(h[:batch_size_t]))  # gating scalar, (batch_size_t, encoder_dim)
