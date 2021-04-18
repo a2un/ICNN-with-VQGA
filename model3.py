@@ -97,10 +97,9 @@ class DecoderRNN(nn.Module):
         super(DecoderRNN, self).__init__()
         self.embed = nn.Embedding(vocab_size, embed_size)
         self.lstm = nn.LSTM(embed_size, hidden_size, num_layers, batch_first=True)
-        self.decode_step = nn.LSTMCell(embed_size + hidden_size, hidden_size, bias=True)  # decoding LSTMCell
         self.linear = nn.Linear(hidden_size, vocab_size)
         self.max_seg_length = max_seq_length
-        self.attention = Attention(hidden_size, hidden_size, attention_dim)
+        self.attention = Attention(embed_size, hidden_size, attention_dim)
         self.vocab_size = vocab_size
         self.init_h = nn.Linear(embed_size, hidden_size)  # linear layer to find initial cell state of LSTMCell
         self.init_c = nn.Linear(embed_size, hidden_size)  # linear layer to find initial cell state of LSTMCell
@@ -148,9 +147,9 @@ class DecoderRNN(nn.Module):
             gate = self.sigmoid(self.f_beta(h[:batch_size_t]))  # gating scalar, (batch_size_t, encoder_dim)
             attention_weighted_encoding = gate * attention_weighted_encoding
 
-            # packed = pack_padded_sequence(torch.cat([embeddings[:batch_size_t, t, :], attention_weighted_encoding], dim=1), lengths.cpu().flatten(), batch_first=True,enforce_sorted=False) 
+            packed = pack_padded_sequence(torch.cat([embeddings[:batch_size_t, t, :], attention_weighted_encoding], dim=1), lengths.cpu().flatten(), batch_first=True,enforce_sorted=False) 
             
-            h, c = self.decode_step(torch.cat([embeddings[:batch_size_t, t, :], attention_weighted_encoding], dim=1),
+            h, c = self.lstm(torch.cat([embeddings[:batch_size_t, t, :], attention_weighted_encoding], dim=1),
                 (h[:batch_size_t], c[:batch_size_t]))  # (batch_size_t, decoder_dim)
             preds = self.fc(h)  # (batch_size_t, vocab_size)
             outputs[:batch_size_t, t, :] = preds
