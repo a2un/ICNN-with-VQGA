@@ -131,18 +131,17 @@ class DecoderRNN(nn.Module):
     def forward(self, features, captions, lengths):
         """Decode image feature vectors and generates captions."""
         embeddings = self.embed(captions)
-        print(features.size())
+
         embeddings = torch.cat((features.unsqueeze(1), embeddings), 1)
         outputs = torch.zeros(features.size(0), self.max_seg_length, self.vocab_size).to(device)
-        h,c = self.init_hidden_state(features.view(-1,embeddings.size(0)))              # (batch_size, decoder_dim)
+        h,c = self.init_hidden_state(embeddings)              # (batch_size, decoder_dim)
 
         # At each time-step, decode by
         # attention-weighing the encoder's output based on the decoder's previous hidden state output
         # then generate a new word in the decoder with the previous word and the attention weighted encoding
         for t in range(self.max_seg_length-1):
             batch_size_t = sum([l > t for l in lengths])
-            print(features.size(),h.size(),c.size())
-            attention_weighted_encoding, alpha = self.attention(features[:batch_size_t],
+            attention_weighted_encoding, alpha = self.attention(embeddings[:batch_size_t],
                                                                 h[:batch_size_t])
             gate = self.sigmoid(self.f_beta(h[:batch_size_t]))  # gating scalar, (batch_size_t, encoder_dim)
             attention_weighted_encoding = gate * attention_weighted_encoding
