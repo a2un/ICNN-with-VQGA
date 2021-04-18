@@ -53,7 +53,7 @@ def main():
 				# Forward, backward and optimize
 				features = encoder(image)
 				questions = questions.to(device)
-				lengths = torch.from_nump(np.array([len(question) for question in questions]))
+				lengths = torch.from_numpy(np.array([len(question) for question in questions]))
 				lenghts = lengths.to(device)
 				outputs = decoder(features, questions, lengths)
 				loss = criterion(outputs, targets)
