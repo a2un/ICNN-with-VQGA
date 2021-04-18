@@ -111,6 +111,7 @@ class DecoderRNN(nn.Module):
     
     def init_hidden_state(self, encoder_out):
         mean_encoder_out = encoder_out.mean(dim=1)
+        print(mean_encoder_out.size())
         if self.c == None:
             self.h = self.init_h(mean_encoder_out)
             self.c = self.init_c(mean_encoder_out)
@@ -126,7 +127,6 @@ class DecoderRNN(nn.Module):
         embed_size = features.size(-1)
         vocab_size = self.vocab_size
         embeddings = self.embed(captions)
-        print(self.c)
         self.init_hidden_state(nn.Linear(embed_size,self.hidden_size).to(device)(features).to(device))
         predictions = torch.zeros().to(device)
         attention_weighted_encoding = self.attention(features, self.h)
