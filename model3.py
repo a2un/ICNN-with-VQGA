@@ -122,14 +122,12 @@ class DecoderRNN(nn.Module):
         """Decode image feature vectors and generates captions."""
         # embeddings = self.embed(captions)
         # embeddings = torch.cat((features.unsqueeze(1), embeddings), 1)
-        features = features.to(device)
-        captions = captions.to(device)
         batch_size = features.size(0)
         embed_size = features.size(-1)
         vocab_size = self.vocab_size
         embeddings = self.embed(captions)
         print(self.c)
-        self.init_hidden_state(nn.Linear(embed_size,self.hidden_size)(features))
+        self.init_hidden_state(nn.Linear(embed_size,self.hidden_size)(features).to(device))
         predictions = torch.zeros().to(device)
         attention_weighted_encoding = self.attention(features, self.h)
         gate = self.sigmoid(self.f_beta(self.h))
