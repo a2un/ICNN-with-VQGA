@@ -111,29 +111,9 @@ class DecoderRNN(nn.Module):
         """Decode image feature vectors and generates captions."""
         embeddings = self.embed(captions)
         embeddings = torch.cat((features.unsqueeze(1), embeddings), 1)
-        batch_size = embeddings.size(0)
-        embed_size = embeddings.size(-1)
-        lengths, sortind = lengths.squeeze(1).sort(dim=0, descending=True)
-        decode_lengths = (lengths - 1).tolist()
-        embeddings = embeddings[sortind]
-        h = self.init_h(embeddings.mean(dim=1))
-        c = self.init_c(embeddings.mean(dim=1))
-        outputs = torch.zeros(batch_size,int(max(decode_lengths))).to(device)
-
-        for t in range(int(max(decode_lengths))):
-            batch_size_t = sum([l > t for l in decode_lengths])
-            attention_weighted_encoding = self.attention(embeddings[:batch_size_t,t,:],h)
-            gate = self.sigmoid(self.f_beta(h))  # gating scalar, (batch_size_t, encoder_dim)
-            attention_weighted_encoding = gate * attention_weighted_encoding
-            # packed = pack_padded_sequence(,
-            #     lengths, batch_first=True) 
-            print(embeddings.size())
-            input = torch.cat([embeddings[:batch_size_t,t,:], attention_weighted_encoding])
-            print(input.view(input.size(0),-1,input.size(1)).size())
-            h, _ = self.lstm(input.view(input.size(0),-1,input.size(1)),
-                            h.unsqueeze(0))
-            outputs[:batch_size_t,t] = self.linear(h.squeeze(0))
-        
+        packed = pack_padded_sequence(embeddings, lengths, batch_first=True) 
+        hiddens, _ = self.lstm(packed)
+        outputs = self.linear(hiddens[0])
         return outputs
     
     def sample(self, features, states=None):
