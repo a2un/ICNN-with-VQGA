@@ -109,7 +109,7 @@ class DecoderRNN(nn.Module):
         self.vocab_size = vocab_size
         self.sigmoid = nn.Sigmoid()
     
-    def init_hidden_state(encoder_out):
+    def init_hidden_state(self, encoder_out):
         mean_encoder_out = encoder_out.mean(dim=1)
         if self.c == None:
             self.h = self.init_h(mean_encoder_out)
