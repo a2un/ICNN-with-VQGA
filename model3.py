@@ -124,10 +124,9 @@ class DecoderRNN(nn.Module):
             attention_weighted_encoding = self.attention(embeddings[:batch_size_t,t,:],h)
             gate = self.sigmoid(self.f_beta(h))  # gating scalar, (batch_size_t, encoder_dim)
             attention_weighted_encoding = gate * attention_weighted_encoding
-            print(gate.size(), attention_weighted_encoding.size())
             # packed = pack_padded_sequence(,
             #     lengths, batch_first=True) 
-            print(h.size(),c.size())
+            print(torch.cat([embeddings[:batch_size_t,t,:], attention_weighted_encoding], dim=1).size())
             h, c = self.lstm(torch.cat([embeddings[:batch_size_t,t,:], attention_weighted_encoding], dim=1).unsqueeze(0),
                             (h,c))
             outputs = self.linear(h)
