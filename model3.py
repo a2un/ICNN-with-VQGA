@@ -120,9 +120,9 @@ class DecoderRNN(nn.Module):
         print(self.h[0].size())
         encoder_out = features.view(features.size(0), -1, features.size(1))
         attention_weighted_encoding = self.attention(encoder_out, self.h[0])
-        gate = self.sigmoid(self.h[0])                 # (hidden_size, 1)
+        gate = self.h[0]                 # (hidden_size, 1)
         print("attention size", attention_weighted_encoding.size(), "gate size", gate.size())                                  
-        attention_weighted_encoding = attention_weighted_encoding * gate            # (batch_size, hidden_size)
+        # attention_weighted_encoding = attention_weighted_encoding * gate            # (batch_size, hidden_size)
         outputs = self.linear(attention_weighted_encoding)
         print("output size",outputs.size(),"hidden size",attention_weighted_encoding.size())
         return outputs
