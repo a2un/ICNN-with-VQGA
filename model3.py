@@ -102,6 +102,8 @@ class DecoderRNN(nn.Module):
         self.attention = Attention(embed_size,hidden_size,hidden_size)
         self.init_h = nn.Linear(embed_size,hidden_size)
         self.init_c = nn.Linear(embed_size,hidden_size)
+        self.h = None
+        self.c = None
         self.f_beta = nn.Linear(hidden_size, embed_size)  # linear layer to create a sigmoid-activated gate
         self.hidden_size = hidden_size
         self.vocab_size = vocab_size
@@ -109,34 +111,31 @@ class DecoderRNN(nn.Module):
     
     def init_hidden_state(encoder_out):
         mean_encoder_out = encoder_out.mean(dim=1)
-        h = self.init_h(mean_encoder_out)
-        c = self.init_c(mean_encoder_out)
-        return h,c
-
+        if self.c == None:
+            self.h = self.init_h(mean_encoder_out)
+            self.c = self.init_c(mean_encoder_out)
+        else:
+            self.h = self.init_h(self.c)
+            self.c = self.init_c(mean_encoder_out)
 
     def forward(self, features, captions, lengths):
         """Decode image feature vectors and generates captions."""
+        # embeddings = self.embed(captions)
+        # embeddings = torch.cat((features.unsqueeze(1), embeddings), 1)
+        batch_size = features.size(0)
+        embed_size = features.size(-1)
+        vocab_size = self.vocab_size
         embeddings = self.embed(captions)
-        embeddings = torch.cat((features.unsqueeze(1), embeddings), 1)
-        # batch_size = features.size(0)
-        # embed_size = features.size(-1)
-        # vocab_size = self.vocab_size
-
-        # encoder_out = features.view(batch_size, -1, embed_size)
-        # caption_lengths, sort_ind = lengths.squeeze(1).sort(dim=0, descending=True)
-        # encoder_out = encoder_out[sort_ind]
-        # encoder_captions = captions[sort_ind]
-
-        # embeddings = self.embed(encoder_captions)
-        # h,c = self.init_hidden_state(encoder_out)
-
-        # decode_lengths = (caption_lengths-1).tolist()
-        # outputs = torch.zeros()
-
-
-        packed = pack_padded_sequence(embeddings, lengths.flatten(), batch_first=True, enforce_sorted=False) 
-        hiddens, _ = self.lstm(packed)
-        outputs = self.linear(hiddens[0])
+        self.init_hidden_state(self.c)
+        predictions = torch.zeros().to(device)
+        attention_weighted_encoding = self.attention(features, self.h)
+        gate = self.sigmoid(self.f_beta(self.h))
+        attention_weighted_encoding = gate * attention_weighted_encoding
+        packed = pack_padded_sequence(torch.cat([embeddings,attention_weighted_encoding], (self.h,self.c), lengths.flatten(), batch_first=True, enforce_sorted=False) 
+        hiddens, currents = self.lstm(packed)
+        self.h = hiddens[0]
+        self.c = currents[0]
+        outputs = self.linear(self.h)
         print(outputs.size(),hiddens[0].size())
         return outputs
     
