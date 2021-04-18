@@ -86,8 +86,8 @@ class Attention(nn.Module):
         att1 = self.encoder_att(encoder_out)  #(128, -1, 16)                  # (batch_size, -1, embed_size)
         att2 = self.decoder_att(decoder_hidden)      #(1170,16)            # (vocab_size, hidden_size)
         print("attention encoder",att1.size(), "attention decoder", att2.size())
-        att = self.full_att((att1 + att2).permute(1,2,0))
-        print("full attention", (att1 + att2).permute(1,2,0).size(),"attention dim",self.attention_dim)                      # (batch_size, hidden_size)
+        att = self.full_att((att1 + att2).permute(1,0,2))
+        print("full att size", att.size(), "att", (att1 + att2).permute(1,0,2).size(),"attention dim",self.attention_dim)                      # (batch_size, hidden_size)
         # alpha = self.softmax(att)                                 # (hidden_size, 1)
         attention_weighted_encoding = (att * encoder_out.mean())#.sum()  #  (batch_size, hidden_size)
 
@@ -102,6 +102,7 @@ class DecoderRNN(nn.Module):
         self.linear = nn.Linear(hidden_size, vocab_size)
         self.max_seg_length = max_seq_length
         self.attention = Attention(embed_size,hidden_size,batch_size)
+        print("decoder init", embed_size, hidden_size)
         self.init_h = nn.Linear(embed_size,hidden_size)
         self.init_c = nn.Linear(embed_size,hidden_size)
         self.h = None
