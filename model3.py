@@ -100,17 +100,22 @@ class DecoderRNN(nn.Module):
     
     def forward(self, features, captions, lengths):
         """Decode image feature vectors and generates captions."""
-        # embeddings = self.embed(captions)
         embeddings = self.embed(captions)
-        print(embeddings.size(),features.unsqueeze(1).size())
         embeddings = torch.cat((features.unsqueeze(1), embeddings), 1)
-        packed = pack_padded_sequence(embeddings, lengths.flatten(), batch_first=True, enforce_sorted=False) 
-        self.h, self.c = self.lstm(packed)
+        packed = pack_padded_sequence(embeddings, lengths, batch_first=True) 
+        hiddens, _ = self.lstm(packed)
+        outputs = self.linear(hiddens[0])
+        # embeddings = self.embed(captions)
+        # embeddings = self.embed(captions)
+        # print(embeddings.size(),features.unsqueeze(1).size())
+        # embeddings = torch.cat((features.unsqueeze(1), embeddings), 1)
+        # packed = pack_padded_sequence(embeddings, lengths.flatten(), batch_first=True, enforce_sorted=False) 
+        # self.h, self.c = self.lstm(packed)
         # print(self.h[0].size())
         # encoder_out = features.view(features.size(0), -1, features.size(1))
-        attention_weighted_encoding = self.h[0] #self.attention(encoder_out, self.h[0])
+        # attention_weighted_encoding = self.attention(encoder_out, self.h[0])
         # print("hidden size",attention_weighted_encoding.squeeze(2).size())
-        outputs = self.linear(attention_weighted_encoding)
+        # outputs = self.linear(attention_weighted_encoding)
         return outputs
     
     def sample(self, features, states=None):
