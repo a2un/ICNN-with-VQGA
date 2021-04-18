@@ -45,23 +45,18 @@ def main():
 	category_id_idx = int(config['categories'][args.categoryname])
 	for epoch in range(1,config['num_epochs']+1):
 		for i, (images, category, questions, lengths) in enumerate(data_loader):
-			# Set mini-batch dataset
-			targets = pack_padded_sequence(questions, lengths, batch_first=True, enforce_sorted=False)[0]
-			targets = targets.to(device)
-			# for image, category_list, question in zip(images, categories, questions):		
-			images = images.to(device)
-			questions = questions.to(device)
-			lengths = torch.Tensor(np.array(lengths).reshape((len(lengths),1)))
-			# Forward, backward and optimize
-			density = get_density(category)
-			features = encoder(images) #encoder(Variable(images), category, torch.Tensor([epoch + 1]),density) #encoder(images)
-			print(summary(encoder, (3,299,299)))
-			outputs = decoder(features, questions, lengths)
-			print("target size",targets.size(),"output size", outputs.size())
-			loss = criterion(outputs, targets)
-			decoder.zero_grad()
-			encoder.zero_grad()
-			loss.backward()
+			density = density(category.cpu().detach().numpy())
+			for image, category_list, question in zip(images, categories, questions):
+				image = image.to(device)
+				category_list = category_list.to(device)
+				question = question.to(device)
+				# Forward, backward and optimize
+				features = encoder(image)
+				outputs = decoder(features, question, len(question))
+				loss = criterion(outputs, targets)
+				decoder.zero_grad()
+				encoder.zero_grad()
+				loss.backward()
 			optimizer.step()
 
 			# Print log info
