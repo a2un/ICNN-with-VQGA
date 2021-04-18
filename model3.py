@@ -116,7 +116,7 @@ class DecoderRNN(nn.Module):
         embeddings = embeddings[sortind]
         h = self.init_h(embeddings.mean(dim=1))
         c = self.init_c(embeddings.mean(dim=1))
-        outputs = torch.zeros((batch_size,max(decode_lengths))).to(device)
+        outputs = torch.zeros(batch_size,int(max(decode_lengths))).to(device)
 
         for t in range(max(decode_lengths)):
             batch_size_t = sum([l > t for l in decode_lengths])
