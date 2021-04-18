@@ -137,7 +137,7 @@ class DecoderRNN(nn.Module):
         packed = pack_padded_sequence(embeddings, lengths.flatten(), batch_first=True, enforce_sorted=False) 
         hiddens, _ = self.lstm(packed)
         outputs = self.linear(hiddens[0])
-        print(outputs.size())
+        print(outputs.size(),hiddens[0].size())
         return outputs
     
     def sample(self, features, states=None):
