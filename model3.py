@@ -133,7 +133,7 @@ class DecoderRNN(nn.Module):
         print("caption embedding size",embeddings.size(),"attention size",attention_weighted_encoding.size())
         input = torch.cat([embeddings,attention_weighted_encoding])
         input = input.view(input.size(0),-1,input.size(1))
-        hidden = (self.h.unsqueeze(0),self.c.unsqueeze(0))
+        hidden = torch.cat(self.h.unsqueeze(0),self.c.unsqueeze(0),dim=1)
         hiddens, currents = self.lstm(input, hidden)
         self.h = hiddens[0].squeeze(1)
         self.c = currents[0].squeeze(1)
