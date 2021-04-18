@@ -86,7 +86,7 @@ class Attention(nn.Module):
         att2 = self.decoder_att(decoder_hidden)      #(1170,16)            # (batch_size, hidden_size)
         print("attention encoder",att1.size(), "attention decoder", att2.size())
         att = self.full_att(att1 + att2)    
-        print("full attention", att.size())                      # (batch_size, hidden_size)
+        print("full attention", (att1 + att2).size())                      # (batch_size, hidden_size)
         # alpha = self.softmax(att)                                 # (hidden_size, 1)
         attention_weighted_encoding = (att * encoder_out.mean())#.sum()  #  (batch_size, hidden_size)
 
