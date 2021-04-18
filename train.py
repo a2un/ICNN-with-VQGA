@@ -45,7 +45,7 @@ def main():
 	category_id_idx = int(config['categories'][args.categoryname])
 	for epoch in range(1,config['num_epochs']+1):
 		for i, (images, categories, questions, lengths) in enumerate(data_loader):
-			density = get_density(category.cpu().detach().numpy())
+			density = get_density(categories.cpu().detach().numpy())
 			for image, category_list, question in zip(images, categories, questions):
 				image = image.to(device)
 				category_list = category_list.to(device)
