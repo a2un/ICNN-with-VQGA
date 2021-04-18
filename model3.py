@@ -116,25 +116,12 @@ class DecoderRNN(nn.Module):
         self.fc.bias.data.fill_(0)
         self.fc.weight.data.uniform_(-0.1, 0.1)    
     
-    def init_hidden_state(self, encoder_out):
-        """
-        Creates the initial hidden and cell for the decoder's LSTM based on the encoded images.
-
-        :param encoder_out: encoded images, a tensor of dimension (batch_size, embed_size)
-        :return: hidden and cell state
-        """
-        mean_encoder_out = encoder_out.mean(dim=1)
-        h = self.init_h(mean_encoder_out)  # (batch_size, hidden_size)
-        c = self.init_c(mean_encoder_out)  
-        return h,c
-
     def forward(self, features, captions, lengths):
         """Decode image feature vectors and generates captions."""
         embeddings = self.embed(captions)
 
         embeddings = torch.cat((features.unsqueeze(1), embeddings), 1)
         outputs = torch.zeros(features.size(0), self.max_seg_length, self.vocab_size).to(device)
-        h,c = self.init_hidden_state(embeddings)              # (batch_size, decoder_dim)
 
         # At each time-step, decode by
         # attention-weighing the encoder's output based on the decoder's previous hidden state output
@@ -148,8 +135,7 @@ class DecoderRNN(nn.Module):
 
             packed = pack_padded_sequence(torch.cat([embeddings[:batch_size_t, t, :], attention_weighted_encoding], dim=1), lengths.cpu().flatten(), batch_first=True,enforce_sorted=False) 
             
-            h, c = self.lstm(torch.cat([embeddings[:batch_size_t, t, :], attention_weighted_encoding], dim=1),
-                (h[:batch_size_t,t,:], c[:batch_size_t,t,:]))  # (batch_size_t, decoder_dim)
+            h, _ = self.lstm(packed)  # (batch_size_t, decoder_dim)
             preds = self.fc(h)  # (batch_size_t, vocab_size)
             outputs[:batch_size_t, t, :] = preds
 
