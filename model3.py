@@ -128,7 +128,7 @@ class DecoderRNN(nn.Module):
             # packed = pack_padded_sequence(,
             #     lengths, batch_first=True) 
             h, c = self.lstm(torch.cat([embeddings[:batch_size_t,t,:], attention_weighted_encoding]).unsqueeze(0),
-                            (h[t].unsqueeze(0),c[t].unsqueeze(0)))
+                            (h[:batch_size_t].unsqueeze(0),c[:batch_size_t].unsqueeze(0)))
             outputs = self.linear(h)
         
         return outputs
