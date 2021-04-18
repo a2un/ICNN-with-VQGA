@@ -134,7 +134,7 @@ class DecoderRNN(nn.Module):
         input = torch.cat([embeddings,attention_weighted_encoding])
         input = input.view(input.size(0),-1,input.size(1))
         hidden = torch.cat([self.h,self.c])
-        hidden = hidden.unsqueeze(0)
+        hidden = hidden.view(1,hidden.size(0),hidden.size(1))
         print("hidden/current before",self.h.size(),self.c.size())
         self.h, self.c = self.lstm(input, hidden)
         print("hidden/current after",self.h.size(),self.c.size())
