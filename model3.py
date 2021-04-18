@@ -123,7 +123,7 @@ class DecoderRNN(nn.Module):
         gate = self.h[0]                 # (hidden_size, 1)
         print("attention size", attention_weighted_encoding.size(), "gate size", gate.size())                                  
         # attention_weighted_encoding = attention_weighted_encoding * gate            # (batch_size, hidden_size)
-        print("hidden size",attention_weighted_encoding.size())
+        print("hidden size",attention_weighted_encoding.squeeze(2).size())
         outputs = self.linear(attention_weighted_encoding)
         return outputs
     
