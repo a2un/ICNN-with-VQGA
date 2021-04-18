@@ -49,7 +49,7 @@ def main():
 			# Forward, backward and optimize
 			features = encoder(images) #encoder(Variable(images), category, torch.Tensor([epoch + 1]),torch.mean(torch.from_numpy(np.arange(1,80)).float())) #encoder(images)
 			outputs = decoder(features, questions, lengths)
-			print("target size",targets.size(),"output size", outputs)
+			print("target size",targets.size(),"output size", outputs.size())
 			loss = criterion(outputs, targets)
 			decoder.zero_grad()
 			encoder.zero_grad()
