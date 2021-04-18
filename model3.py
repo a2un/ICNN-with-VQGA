@@ -107,7 +107,7 @@ class DecoderRNN(nn.Module):
         self.f_beta = nn.Linear(hidden_size, 1)  # linear layer to create a sigmoid-activated gate
         self.hidden_size = hidden_size
         self.vocab_size = vocab_size
-        self.sigmoid = nn.Sigmoid()
+        self.sigmoid = nn.Sigmoid(dim = 1)
     
     def forward(self, features, captions, lengths):
         """Decode image feature vectors and generates captions."""
@@ -119,7 +119,7 @@ class DecoderRNN(nn.Module):
         self.h, self.c = self.lstm(packed)
         encoder_out = features.view(features.size(0), -1, features.size(1))
         attention_weighted_encoding = self.attention(encoder_out, self.h[0])
-        gate = self.f_beta(self.h[0])                 # (hidden_size, vocab_size)
+        gate = self.sigmoid(self.f_beta(self.h[0]))                 # (hidden_size, 1)
         print("attention size", attention_weighted_encoding.size(), "gate size", gate.size())                                  
         attention_weighted_encoding = attention_weighted_encoding * gate            # (batch_size, hidden_size)
         outputs = self.linear(attention_weighted_encoding)
