@@ -131,8 +131,7 @@ class DecoderRNN(nn.Module):
         attention_weighted_encoding = gate * attention_weighted_encoding
         embeddings = embeddings.mean(dim=1)
         print("caption embedding size",embeddings.size(),"attention size",attention_weighted_encoding.size())
-        packed = pack_padded_sequence(torch.cat([embeddings,attention_weighted_encoding]), (self.h,self.c), batch_first=True, enforce_sorted=False) 
-        hiddens, currents = self.lstm(packed)
+        hiddens, currents = self.lstm(torch.cat([embeddings,attention_weighted_encoding]), (self.h,self.c), batch_first=True)
         self.h = hiddens[0]
         self.c = currents[0]
         outputs = self.linear(self.h)
