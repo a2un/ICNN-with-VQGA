@@ -88,7 +88,7 @@ class Attention(nn.Module):
         att = self.full_att(self.relu(att1 + att2.unsqueeze(0))).squeeze(2)  # (batch_size, )
         alpha = self.softmax(att)  # (batch_size, )
         print(alpha.size())
-        attention_weighted_encoding = (encoder_out * alpha.unsqueeze(0)).sum(dim=1)  # (batch_size, embed_size)
+        attention_weighted_encoding = (encoder_out * alpha.unsqueeze(1)).sum(dim=1)  # (batch_size, embed_size)
 
         return attention_weighted_encoding
 
