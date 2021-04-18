@@ -99,6 +99,8 @@ class DecoderRNN(nn.Module):
         self.linear = nn.Linear(hidden_size, vocab_size)
         self.hidden_size = hidden_size
         self.vocab_size = vocab_size
+        self.init_h = nn.Linear(embed_size,self.hidden_size)
+        self.init_c = nn.Linear(embed_size,self.hidden_size)
         self.max_seg_length = max_seq_length
         self.attention = Attention(embed_size,hidden_size,hidden_size)
 
@@ -112,8 +114,8 @@ class DecoderRNN(nn.Module):
         lengths, sortind = lengths.squeeze(1).sort(dim=0, descending=True)
         decode_lengths = (lengths - 1).tolist()
         embeddings = embeddings[sortind]
-        h = nn.Linear(embeddings.size(-1),self.hidden_size)(embeddings.mean(dim=1))
-        c = nn.Linear(embeddings.size(-1),self.hidden_size)(embeddings.mean(dim=1))
+        h = init_h(embeddings.mean(dim=1))
+        c = init_c(embeddings.mean(dim=1))
         outputs = torch.zeros(batch_size,max(decode_lengths))
 
         for t in range(max(decode_lengths)):
