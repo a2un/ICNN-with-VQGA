@@ -84,9 +84,8 @@ class Attention(nn.Module):
         """
         att1 = self.encoder_att(encoder_out)  # (batch_size, embed_size)
         att2 = self.decoder_att(decoder_hidden)  # (batch_size, hidden_size)
-        att = self.full_att(self.relu(att1 + att2.unsqueeze(0))).squeeze(2)  # (batch_size, )
-        alpha = self.softmax(att)  # (batch_size, )
-        print(encoder_out.size(),alpha.unsqueeze(2).size())
+        att = self.full_att(self.relu(att1 + att2.unsqueeze(0))).squeeze(2)  # (batch_size, embed_size)
+        alpha = self.softmax(att)  # (batch_size, embed_size)
         attention_weighted_encoding = (encoder_out * alpha.unsqueeze(2)).sum(dim=1)  # (batch_size, embed_size)
 
         return attention_weighted_encoding
@@ -125,8 +124,7 @@ class DecoderRNN(nn.Module):
             attention_weighted_encoding = self.attention(embeddings,h[0])
             gate = self.sigmoid(self.f_beta(h))  # gating scalar, (batch_size_t, encoder_dim)
             attention_weighted_encoding = gate * attention_weighted_encoding
-            print(embeddings.size(),attention_weighted_encoding.size())
-            packed = pack_padded_sequence(torch.cat([embeddings, attention_weighted_encoding], dim=1),
+            packed = pack_padded_sequence(torch.cat([embeddings, attention_weighted_encoding.unsqueeze(2)], dim=1),
                 lengths, batch_first=True) 
             h, c = self.lstm(packed)
             outputs = self.linear(h[0])
