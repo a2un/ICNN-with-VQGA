@@ -52,7 +52,10 @@ def main():
 				question = question.to(device)
 				# Forward, backward and optimize
 				features = encoder(image)
-				outputs = decoder(features, questions, len(questions))
+				questions = questions.to(device)
+				lengths = len(questions)
+				lenghts = lengths.to(device)
+				outputs = decoder(features, questions, lengths)
 				loss = criterion(outputs, targets)
 				decoder.zero_grad()
 				encoder.zero_grad()
