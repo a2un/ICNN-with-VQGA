@@ -97,13 +97,13 @@ class DecoderRNN(nn.Module):
         self.embed = nn.Embedding(vocab_size, embed_size)
         self.lstm = nn.LSTM(embed_size, hidden_size, num_layers, batch_first=True)
         self.linear = nn.Linear(hidden_size, vocab_size)
-        self.hidden_size = hidden_size
-        self.vocab_size = vocab_size
-        self.init_h = nn.Linear(embed_size,self.hidden_size)
-        self.init_c = nn.Linear(embed_size,self.hidden_size)
         self.max_seg_length = max_seq_length
         self.attention = Attention(embed_size,hidden_size,hidden_size)
-
+        self.init_h = nn.Linear(embed_size,self.hidden_size)
+        self.init_c = nn.Linear(embed_size,self.hidden_size)
+        self.f_beta = nn.Linear(self.hidden_size, embed_size)  # linear layer to create a sigmoid-activated gate
+        self.hidden_size = hidden_size
+        self.vocab_size = vocab_size
         
     def forward(self, features, captions, lengths):
         """Decode image feature vectors and generates captions."""
@@ -121,6 +121,8 @@ class DecoderRNN(nn.Module):
         for t in range(int(max(decode_lengths))):
             batch_size_t = sum([l > t for l in decode_lengths])
             attention_weighted_encoding = self.attention(embeddings[:batch_size_t],h[:batch_size_t])
+            gate = self.sigmoid(self.f_beta(h[:batch_size_t]))  # gating scalar, (batch_size_t, encoder_dim)
+            attention_weighted_encoding = gate * attention_weighted_encoding
             packed = pack_padded_sequence(
                 torch.cat([embeddings[:batch_size_t, t], attention_weighted_encoding, 
                     h[:batch_size_t], c[:batch_size_t]], dim=1),
