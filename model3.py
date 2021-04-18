@@ -99,9 +99,9 @@ class DecoderRNN(nn.Module):
         self.linear = nn.Linear(hidden_size, vocab_size)
         self.max_seg_length = max_seq_length
         self.attention = Attention(embed_size,hidden_size,hidden_size)
-        self.init_h = nn.Linear(embed_size,self.hidden_size)
-        self.init_c = nn.Linear(embed_size,self.hidden_size)
-        self.f_beta = nn.Linear(self.hidden_size, embed_size)  # linear layer to create a sigmoid-activated gate
+        self.init_h = nn.Linear(embed_size,hidden_size)
+        self.init_c = nn.Linear(embed_size,hidden_size)
+        self.f_beta = nn.Linear(hidden_size, embed_size)  # linear layer to create a sigmoid-activated gate
         self.hidden_size = hidden_size
         self.vocab_size = vocab_size
         
