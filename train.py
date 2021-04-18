@@ -53,7 +53,7 @@ def main():
 			questions = questions.to(device)
 			lengths = torch.Tensor(np.array(lengths).reshape((len(lengths),1)))
 			# Forward, backward and optimize
-			density = get_density(category, axis=0))
+			density = get_density(category, axis=0)
 			features = encoder(images) #encoder(Variable(images), category, torch.Tensor([epoch + 1]),density) #encoder(images)
 			print(summary(encoder, (3,299,299)))
 			outputs = decoder(features, questions, lengths)
