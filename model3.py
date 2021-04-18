@@ -117,7 +117,7 @@ class DecoderRNN(nn.Module):
         # embeddings = torch.cat((features.unsqueeze(1), embeddings), 1)
         packed = pack_padded_sequence(embeddings, lengths.flatten(), batch_first=True, enforce_sorted=False) 
         self.h, self.c = self.lstm(packed)
-        print(self.h.size())
+        print(self.h[0].size())
         encoder_out = features.view(features.size(0), -1, features.size(1))
         attention_weighted_encoding = self.attention(encoder_out, self.h[0])
         gate = self.sigmoid(self.h[0])                 # (hidden_size, 1)
