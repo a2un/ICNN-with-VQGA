@@ -110,7 +110,6 @@ class DecoderRNN(nn.Module):
         self.sigmoid = nn.Sigmoid()
     
     def init_hidden_state(self, encoder_out):
-        print(mean_encoder_out.size())
         if self.c == None:
             self.h = self.init_h(encoder_out)
             self.c = self.init_c(encoder_out)
