@@ -68,6 +68,7 @@ class Attention(nn.Module):
         :param attention_dim: size of the attention network
         """
         super(Attention, self).__init__()
+        self.attention_dim = attention_dim
         self.encoder_att = nn.Linear(encoder_dim, attention_dim)  # linear layer to transform encoded image
         self.decoder_att = nn.Linear(decoder_dim, attention_dim)  # linear layer to transform decoder's output
         self.full_att = nn.Linear(attention_dim, 1)  # linear layer to calculate values to be softmax-ed
@@ -86,7 +87,7 @@ class Attention(nn.Module):
         att2 = self.decoder_att(decoder_hidden)      #(1170,16)            # (vocab_size, hidden_size)
         print("attention encoder",att1.size(), "attention decoder", att2.size())
         att = self.full_att(att1 + att2)
-        print("full attention", att.size())                      # (batch_size, hidden_size)
+        print("full attention", att.size(),"attention dim",self.attention_dim)                      # (batch_size, hidden_size)
         # alpha = self.softmax(att)                                 # (hidden_size, 1)
         attention_weighted_encoding = (att * encoder_out.mean())#.sum()  #  (batch_size, hidden_size)
 
