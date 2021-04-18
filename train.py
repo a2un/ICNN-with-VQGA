@@ -12,7 +12,7 @@ def main():
 	parser = argparse.ArgumentParser(description='CS2770 Project Train')
 	parser.add_argument('data_set', type=str, help='Train on "vqa" or "vqg" questions')
 	parser.add_argument('--config', type=pathlib.Path, default='config.ini', help='The config file')
-	parser.add_argument('--categoryname', type=str, default='Person', help='classification category')
+	parser.add_argument('--categoryname', type=str, default='person', help='classification category')
 
 	args = parser.parse_args()
 	root_dir = os.path.dirname(os.path.realpath(__file__))
