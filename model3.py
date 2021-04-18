@@ -127,7 +127,7 @@ class DecoderRNN(nn.Module):
         vocab_size = self.vocab_size
         embeddings = self.embed(captions)
         print(self.c)
-        self.init_hidden_state(self.c)
+        self.init_hidden_state(features)
         predictions = torch.zeros().to(device)
         attention_weighted_encoding = self.attention(features, self.h)
         gate = self.sigmoid(self.f_beta(self.h))
