@@ -110,14 +110,13 @@ class DecoderRNN(nn.Module):
         self.sigmoid = nn.Sigmoid()
     
     def init_hidden_state(self, encoder_out):
-        mean_encoder_out = encoder_out.mean(dim=1)
         print(mean_encoder_out.size())
         if self.c == None:
-            self.h = self.init_h(mean_encoder_out)
-            self.c = self.init_c(mean_encoder_out)
+            self.h = self.init_h(encoder_out)
+            self.c = self.init_c(encoder_out)
         else:
             self.h = self.init_h(self.c)
-            self.c = self.init_c(mean_encoder_out)
+            self.c = self.init_c(encoder_out)
 
     def forward(self, features, captions, lengths):
         """Decode image feature vectors and generates captions."""
