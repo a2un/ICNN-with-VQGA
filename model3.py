@@ -82,7 +82,7 @@ class Attention(nn.Module):
         :param decoder_hidden: previous decoder output, a tensor of dimension (batch_size, hidden_size)
         :return: attention weighted encoding, weights
         """
-        att1 = self.encoder_att(encoder_out)  # (batch_size, hidden_size)
+        att1 = self.encoder_att(encoder_out)  # (batch_size, embed_size)
         att2 = self.decoder_att(decoder_hidden)  # (batch_size, hidden_size)
         print(att1.size(),att2.size())
         att = self.full_att(self.relu(att1 + att2.unsqueeze(0))).squeeze(2)  # (batch_size, )
@@ -110,6 +110,7 @@ class DecoderRNN(nn.Module):
     def forward(self, features, captions, lengths):
         """Decode image feature vectors and generates captions."""
         embeddings = self.embed(captions)
+        print(features.size(),captions.size())
         embeddings = torch.cat((features.unsqueeze(1), embeddings), 1)
         batch_size = embeddings.size(0)
         embed_size = embeddings.size(-1)
