@@ -82,12 +82,12 @@ class Attention(nn.Module):
         :param decoder_hidden: previous decoder output, a tensor of dimension (batch_size, hidden_size)
         :return: attention weighted encoding, weights
         """
-        att1 = self.encoder_att(encoder_out)  # (batch_size, attention_dim)
-        att2 = self.decoder_att(decoder_hidden)  # (batch_size, attention_dim)
+        att1 = self.encoder_att(encoder_out)  # (batch_size, hidden_size)
+        att2 = self.decoder_att(decoder_hidden)  # (batch_size, hidden_size)
         print(att1.size(),att2.size())
-        att = self.full_att(self.relu(att1 + att2.unsqueeze(1))).squeeze(2)  # (batch_size, )
+        att = self.full_att(self.relu(att1 + att2.unsqueeze(0))).squeeze(2)  # (batch_size, )
         alpha = self.softmax(att)  # (batch_size, )
-        attention_weighted_encoding = (encoder_out * alpha.unsqueeze(2)).sum(dim=1)  # (batch_size, encoder_dim)
+        attention_weighted_encoding = (encoder_out * alpha.unsqueeze(0)).sum(dim=1)  # (batch_size, embed_size)
 
         return attention_weighted_encoding
 
