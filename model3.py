@@ -132,6 +132,7 @@ class DecoderRNN(nn.Module):
     def forward(self, features, captions, lengths):
         """Decode image feature vectors and generates captions."""
         embeddings = self.embed(captions)
+        print(features.size())
         embeddings = torch.cat((features.unsqueeze(1), embeddings), 1)
         outputs = torch.zeros(features.size(0), self.max_seg_length, self.vocab_size).to(device)
         h,c = self.init_hidden_state(features)              # (batch_size, decoder_dim)
