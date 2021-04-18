@@ -143,7 +143,7 @@ class DecoderRNN(nn.Module):
         # At each time-step, decode by
         # attention-weighing the encoder's output based on the decoder's previous hidden state output
         # then generate a new word in the decoder with the previous word and the attention weighted encoding
-        for t in range(self.max_seg_length):
+        for t in range(self.max_seg_length-1):
             batch_size_t = sum([l > t for l in lengths])
             attention_weighted_encoding, alpha = self.attention(encoder_out[:batch_size_t],
                                                                 h[:batch_size_t])
