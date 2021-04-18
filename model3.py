@@ -106,14 +106,38 @@ class DecoderRNN(nn.Module):
         self.hidden_size = hidden_size
         self.vocab_size = vocab_size
         self.sigmoid = nn.Sigmoid()
-        
+    
+    def init_hidden_state(encoder_out):
+        mean_encoder_out = encoder_out.mean(dim=1)
+        h = self.init_h(mean_encoder_out)
+        c = self.init_c(mean_encoder_out)
+        return h,c
+
+
     def forward(self, features, captions, lengths):
         """Decode image feature vectors and generates captions."""
         embeddings = self.embed(captions)
         embeddings = torch.cat((features.unsqueeze(1), embeddings), 1)
+        # batch_size = features.size(0)
+        # embed_size = features.size(-1)
+        # vocab_size = self.vocab_size
+
+        # encoder_out = features.view(batch_size, -1, embed_size)
+        # caption_lengths, sort_ind = lengths.squeeze(1).sort(dim=0, descending=True)
+        # encoder_out = encoder_out[sort_ind]
+        # encoder_captions = captions[sort_ind]
+
+        # embeddings = self.embed(encoder_captions)
+        # h,c = self.init_hidden_state(encoder_out)
+
+        # decode_lengths = (caption_lengths-1).tolist()
+        # outputs = torch.zeros()
+
+
         packed = pack_padded_sequence(embeddings, lengths.flatten(), batch_first=True, enforce_sorted=False) 
         hiddens, _ = self.lstm(packed)
         outputs = self.linear(hiddens[0])
+        print(outputs.size())
         return outputs
     
     def sample(self, features, states=None):
