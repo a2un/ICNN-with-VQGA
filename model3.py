@@ -63,7 +63,7 @@ class Attention(nn.Module):
 
     def __init__(self, encoder_dim, decoder_dim, attention_dim):
         """
-        :param encoder_dim: feature size of encoded images
+        :param encoder_dim: feature size 
         :param decoder_dim: size of decoder's RNN
         :param attention_dim: size of the attention network
         """
@@ -78,59 +78,37 @@ class Attention(nn.Module):
         """
         Forward propagation.
 
-        :param encoder_out: encoded images, a tensor of dimension (batch_size, num_pixels, encoder_dim)
-        :param decoder_hidden: previous decoder output, a tensor of dimension (batch_size, decoder_dim)
+        :param encoder_out: encoded images, a tensor of dimension (batch_size, embed_size)
+        :param decoder_hidden: previous decoder output, a tensor of dimension (batch_size, hidden_size)
         :return: attention weighted encoding, weights
         """
-        att1 = self.encoder_att(encoder_out)  # (batch_size, num_pixels, attention_dim)
+        att1 = self.encoder_att(encoder_out)  # (batch_size, attention_dim)
         att2 = self.decoder_att(decoder_hidden)  # (batch_size, attention_dim)
         att = self.full_att(self.relu(att1 + att2.unsqueeze(1))).squeeze(2)  # (batch_size, num_pixels)
-        alpha = self.softmax(att)  # (batch_size, num_pixels)
+        # alpha = self.softmax(att)  # (batch_size, num_pixels)
         attention_weighted_encoding = (encoder_out * alpha.unsqueeze(2)).sum(dim=1)  # (batch_size, encoder_dim)
 
-        return attention_weighted_encoding, alpha
-
+        return attention_weighted_encoding
 
 class DecoderRNN(nn.Module):
-    def __init__(self, attention_dim, embed_size, hidden_size, vocab_size, num_layers, max_seq_length=20):
+    def __init__(self, embed_size, hidden_size, vocab_size, num_layers, max_seq_length=20):
         """Set the hyper-parameters and build the layers."""
         super(DecoderRNN, self).__init__()
         self.embed = nn.Embedding(vocab_size, embed_size)
         self.lstm = nn.LSTM(embed_size, hidden_size, num_layers, batch_first=True)
         self.linear = nn.Linear(hidden_size, vocab_size)
         self.max_seg_length = max_seq_length
-        self.attention = Attention(embed_size, hidden_size, attention_dim)
-        self.vocab_size = vocab_size
-        self.f_beta = nn.Linear(embed_size, hidden_size)  # linear layer to create a sigmoid-activated gate
-        self.fc = nn.Linear(hidden_size, vocab_size)  # linear layer to find scores over vocabulary
-        self.sigmoid = nn.Sigmoid()
-        self.init_weights()  # initialize some layers with the uniform distribution
+        self.attention = Attention(embed_size,hidden_size,hidden_size)
 
-    def init_weights(self):
-        """
-        Initializes some parameters with values from the uniform distribution, for easier convergence.
-        """
-        self.embed.weight.data.uniform_(-0.1, 0.1)
-        self.fc.bias.data.fill_(0)
-        self.fc.weight.data.uniform_(-0.1, 0.1)    
-    
+        
     def forward(self, features, captions, lengths):
         """Decode image feature vectors and generates captions."""
         embeddings = self.embed(captions)
-
         embeddings = torch.cat((features.unsqueeze(1), embeddings), 1)
-        outputs = torch.zeros(features.size(0), self.max_seg_length, self.vocab_size).to(device)
-        h = self.fc(embeddings.mean(dim=1))  
-
-        # At each time-step, decode by
-        # attention-weighing the encoder's output based on the decoder's previous hidden state output
-        # then generate a new word in the decoder with the previous word and the attention weighted encoding
-        attention_weighted_encoding, alpha = self.attention(embeddings,h)
-        gate = self.sigmoid(self.f_beta(h))  # gating scalar, (batch_size_t, encoder_dim)
-        attention_weighted_encoding = gate * attention_weighted_encoding
-        packed = pack_padded_sequence(torch.cat([embeddings, attention_weighted_encoding], dim=1), lengths.cpu().flatten(), batch_first=True,enforce_sorted=False) 
-        h, _ = self.lstm(packed)  # (batch_size_t, decoder_dim)
-        outputs = self.fc(h[0])  # (batch_size_t, vocab_size)
+        print(features.size(-1))
+        packed = pack_padded_sequence(embeddings, lengths, batch_first=True) 
+        hiddens, _ = self.lstm(packed)
+        outputs = self.linear(hiddens[0])
         return outputs
     
     def sample(self, features, states=None):

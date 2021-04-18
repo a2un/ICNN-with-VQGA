@@ -20,7 +20,6 @@ def proc(args, mode, root_dir, file_name):
     # General config parameters
     params = config['general']
     crop_size = int(params['crop_size'])
-    attention_dim = int(params['attention_dim'])
     embed_size = int(params['embed_size'])
     hidden_size = int(params['hidden_size'])
     num_layers = int(params['num_layers'])
@@ -73,6 +72,6 @@ def proc(args, mode, root_dir, file_name):
     #     os.system(" wget -O " + pretrain_path + " --no-check-certificate " + download_resnet_18_path)
     # Build the models
     encoder = EncoderCNN(embed_size) #resnet_18(pretrain_path, int(config['categories'][args.categoryname]), float(config['icnn_args']['dropoutrate']), config['icnn_args']['losstype']) #
-    decoder = DecoderRNN(attention_dim, embed_size, hidden_size, len(vocab), num_layers)
+    decoder = DecoderRNN(embed_size, hidden_size, len(vocab), num_layers)
     
     return encoder, decoder, data_loader, c
