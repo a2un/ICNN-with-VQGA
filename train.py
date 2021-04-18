@@ -3,7 +3,7 @@ from torch.nn.utils.rnn import pack_padded_sequence
 from utils.preproc import proc
 from dataclasses import dataclass
 import torch.autograd.variable as Variable
-
+from torchsummary import summary
 # Device configuration
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
@@ -48,6 +48,7 @@ def main():
 			lengths = torch.Tensor(np.array(lengths).reshape((len(lengths),1)))
 			# Forward, backward and optimize
 			features = encoder(images) #encoder(Variable(images), category, torch.Tensor([epoch + 1]),torch.mean(torch.from_numpy(np.arange(1,80)).float())) #encoder(images)
+			print(summary(encoder, (3,299,299)))
 			outputs = decoder(features, questions, lengths)
 			print("target size",targets.size(),"output size", outputs.size())
 			loss = criterion(outputs, targets)
