@@ -112,8 +112,8 @@ class DecoderRNN(nn.Module):
         lengths, sortind = lengths.squeeze(1).sort(dim=0, descending=True)
         decode_lengths = (lengths - 1).tolist()
         embeddings = embeddings[sortind]
-        h = nn.linear(embeddings.size(-1),self.hidden_size)(embeddings.mean(dim=1))
-        c = nn.linear(embeddings.size(-1),self.hidden_size)(embeddings.mean(dim=1))
+        h = nn.Linear(embeddings.size(-1),self.hidden_size)(embeddings.mean(dim=1))
+        c = nn.Linear(embeddings.size(-1),self.hidden_size)(embeddings.mean(dim=1))
         outputs = torch.zeros(batch_size,max(decode_lengths))
 
         for t in range(max(decode_lengths)):
