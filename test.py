@@ -1,16 +1,24 @@
 import argparse, copy, nltk, os, pathlib, torch, numpy as np
 from utils.preproc import proc
 
-def test(encoder, decoder, data_loader, id_to_word, doOutputQuestions=False):
+def get_density(label):
+    if label.shape[1]>1:
+        label = torch.from_numpy(label[:,:,0,0])
+        density = torch.mean((label>0).float(),0)
+    else:
+        density = torch.Tensor([0])
+    return density
+
+def test(encoder, icnn_encoder, decoder, data_loader, id_to_word, epoch, doOutputQuestions=False):
 	device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 	c = nltk.translate.bleu_score.SmoothingFunction()
 	
 	total_bleu_score = 0.0
 	
-	for i, (images, questions, lengths) in enumerate(data_loader):
+	for i, (images, categories, questions, lengths) in enumerate(data_loader):
 		print(f'Testing step {i} of {len(data_loader)}')
 		images = images.to(device)
-		feature = encoder(images)
+		feature = icnn_encoder(images,categories, torch.Tensor([epoch+1]), get_density(categories.detach().cpu().numpy()))
 		sampled_ids = decoder.sample(feature)
 		sampled_ids = sampled_ids[0].cpu().numpy()          # (1, max_seq_length) -> (max_seq_length)
 		questions = questions.detach().cpu().numpy()
@@ -40,18 +48,19 @@ if __name__ == '__main__':
 	args = parser.parse_args()
 	root_dir = os.path.dirname(os.path.realpath(__file__))
 
-	encoder, decoder, data_loader, config = proc(args, 'test', root_dir, 'test.py')
+	encoder, icnn_encoder, decoder, data_loader, config = proc(args, 'test', root_dir, 'test.py')
 
-	encoder_path = os.path.join(config['model_dir'], 'best_encoder.pth')
+	icnn_encoder_path = os.path.join(config['model_dir'], 'best_encoder.pth')
 	decoder_path = os.path.join(config['model_dir'], 'best_decoder.pth')
-	if not os.path.exists(encoder_path):
+	if not os.path.exists(icnn_encoder_path):
 		raise Exception(f'Encoder does not exist: {encoder_path}')
 	if not os.path.exists(decoder_path):
 		raise Exception(f'Decoder does not exist: {decoder_path}')
 	
 	encoder = encoder.to(device)
 	decoder = decoder.to(device)
-	encoder.load_state_dict(torch.load(encoder_path))
+	icnn_encoder = icnn_encoder.to(device)
+	icnn_encoder.load_state_dict(torch.load(icnn_encoder_path))
 	decoder.load_state_dict(torch.load(decoder_path))
 
 	bleu_score = test(encoder, decoder, data_loader, config['id_to_word'], True)
