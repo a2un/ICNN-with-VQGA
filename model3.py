@@ -29,9 +29,9 @@ class EncoderCNN(nn.Module):
         self.linear = nn.Linear(2048, embed_size)
         self.bn = nn.BatchNorm1d(embed_size, momentum=0.01)
      
-    def __call__(self, inputs):
-        # super().__call__(torch.unsqueeze(inputs,0))
-        return self.activation.features
+    # def __call__(self, inputs):
+    #     # super().__call__(torch.unsqueeze(inputs,0))
+    #     return self.activation.features
     
     # Pass a list of ints representing the modules of the encoder for which you want to extract features
     def create_forward_hooks(self, layer_list):
