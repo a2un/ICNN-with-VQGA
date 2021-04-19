@@ -34,6 +34,7 @@ def main():
 
 	# Train the models
 	total_step = len(data_loader)
+	layers = [1,2,3,4] 
 	# category_id_idx = int(config['categories'][args.categoryname])
 	for epoch in range(1,config['num_epochs']+1):
 		for i, (images, categories, questions, lengths) in enumerate(data_loader):
@@ -47,8 +48,11 @@ def main():
 			# category  = torch.from_numpy(category.reshape((1,category.shape[0],1,1))).to(device)
 			lengths = torch.Tensor(np.array(lengths).reshape((len(lengths),1)))
 			# Forward, backward and optimize
+			encoder.create_forward_hooks(layers)
 			features = encoder(images) #encoder(Variable(images), category, torch.Tensor([epoch + 1]),torch.mean(torch.from_numpy(np.arange(1,80)).float())) #encoder(images)
-			outputs = decoder(features, questions, lengths)
+			layer_features = [encoder.extract_layer_features(i) for i in layers]
+			encoder.close_forward_hooks()
+			outputs = decoder(layer_features, questions, lengths)
 			loss = criterion(outputs, targets)
 			decoder.zero_grad()
 			encoder.zero_grad()
