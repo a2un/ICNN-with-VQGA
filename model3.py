@@ -98,7 +98,7 @@ class DecoderRNN(nn.Module):
         embeddings = self.embed(captions)
         layer_features_l = [len(l) for l in layer_features]
         m = max(layer_features_l)
-        layer_features = [pad(l,(m-l.size(),m-l.size(),m-l.size(),m-l.size()))] for l in layer_features if l.size() < m]
+        layer_features = [pad(l,(m-l.size(),m-l.size(),m-l.size(),m-l.size())) for l in layer_features if l.size() < m]
         layer_features = torch.cat(layer_features)
         # print("layer_features size", layer_features[0].size())
         # embeddings = torch.cat((features.unsqueeze(1), embeddings), 1)
