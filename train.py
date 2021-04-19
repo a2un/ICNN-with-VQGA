@@ -4,6 +4,8 @@ from utils.preproc import proc
 from dataclasses import dataclass
 import torch.autograd.variable as Variable
 from torchsummary import summary
+from icnn_resnet_18 import resnet_18
+
 # Device configuration
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
@@ -17,7 +19,7 @@ def main():
 	args = parser.parse_args()
 	root_dir = os.path.dirname(os.path.realpath(__file__))
 
-	encoder, decoder, data_loader, config = proc(args, 'train', root_dir, 'train.py')
+	encoder, icnn_encoder, decoder, data_loader, config = proc(args, 'train', root_dir, 'train.py')
 
 	# Create model directory
 	if not os.path.exists(config['model_dir']):
@@ -44,14 +46,16 @@ def main():
 			# for image, category_list, question in zip(images, categories, questions):		
 			images = images.to(device)
 			questions = questions.to(device)
+			categories = categories.to(device)
 			# category = np.array([category_list[category_id_idx] for category_list in categories])
 			# category  = torch.from_numpy(category.reshape((1,category.shape[0],1,1))).to(device)
 			lengths = torch.Tensor(np.array(lengths).reshape((len(lengths),1)))
-			print("category shape",categories.size())
+			# print("category shape",categories.size())
 			# Forward, backward and optimize
 			encoder.create_forward_hooks(layers)
-			features = encoder(images) #encoder(Variable(images), category, torch.Tensor([epoch + 1]),torch.mean(torch.from_numpy(np.arange(1,80)).float())) #encoder(images)
-			# summary(encoder, (3,7,7))
+			features = encoder(images) 
+			#features = icnn_encoder(Variable(images), category, torch.Tensor([epoch + 1]),torch.mean(torch.from_numpy(np.arange(1,80)).float())) #encoder(images)
+			# summary(icnn_encoder, (3,7,7))
 			layer_features = [encoder.extract_layer_features(i) for i in layers]
 			encoder.close_forward_hooks()
 			outputs = decoder(layer_features, questions, lengths)
