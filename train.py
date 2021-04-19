@@ -3,7 +3,7 @@ from torch.nn.utils.rnn import pack_padded_sequence
 from utils.preproc import proc
 from dataclasses import dataclass
 import torch.autograd.variable as Variable
-
+from torchsummary import summary
 # Device configuration
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
@@ -50,6 +50,7 @@ def main():
 			# Forward, backward and optimize
 			encoder.create_forward_hooks(layers)
 			features = encoder(images) #encoder(Variable(images), category, torch.Tensor([epoch + 1]),torch.mean(torch.from_numpy(np.arange(1,80)).float())) #encoder(images)
+			summary(encoder, (3,7,7))
 			layer_features = [encoder.extract_layer_features(i) for i in layers]
 			encoder.close_forward_hooks()
 			outputs = decoder(layer_features, questions, lengths)
