@@ -1,8 +1,11 @@
 # CS2770 Project End-to-End Model
 
 The source fork for this project is E2E model here <https://github.com/amb467/cs2770-project-e2e>
+
 Team Members: [Amanda](https://github.com/amb467) and [Arun](https://github.com/a2un)
+
 Contributions:
+
 | Team member | Task |
 | -------------|----|
 | Amanda       | Data Annotation, E2E Generation Model, Visualization, Training/Testing model, Slide preparation, Proposals  |
