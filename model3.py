@@ -38,6 +38,41 @@ class EncoderCNN(resnet.ResNet):
         for activation in self.activations.values():
             activation.close()
 
+class Attention(nn.Module):
+    """
+    Attention Network.
+    """
+
+    def __init__(self, encoder_dim, decoder_dim, attention_dim):
+        """
+        :param encoder_dim: feature size 
+        :param decoder_dim: size of decoder's RNN
+        :param attention_dim: size of the attention network
+        """
+        super(Attention, self).__init__()
+        self.encoder_att = nn.Linear(encoder_dim, attention_dim)  # linear layer to transform encoded image
+        self.decoder_att = nn.Linear(decoder_dim, attention_dim)  # linear layer to transform decoder's output
+        self.full_att = nn.Linear(attention_dim, 1)  # linear layer to calculate values to be softmax-ed
+        self.relu = nn.ReLU()
+        self.softmax = nn.Softmax(dim=1)  # softmax layer to calculate weights
+
+    def forward(self, encoder_out, decoder_hidden):
+        """
+        Forward propagation.
+
+        :param encoder_out: encoded images, a tensor of dimension (batch_size, embed_size, hidden_size)
+        :param decoder_hidden: previous decoder output, a tensor of dimension (batch_size, hidden_size)
+        :return: attention weighted encoding, weights
+        """
+        att1 = self.encoder_att(encoder_out)                    # (batch_size, -1, embed_size)
+        att2 = self.decoder_att(decoder_hidden)                 # (batch_size, hidden_size)
+        print("attention encoder",att1.size(), "attention decoder", att2.size())
+        att = self.full_att(att1 + att2)                          # (batch_size, hidden_size)
+        # alpha = self.softmax(att)                                 # (hidden_size, 1)
+        attention_weighted_encoding = (att * encoder_out.mean())#.sum()  #  (batch_size, hidden_size)
+
+        return attention_weighted_encoding
+
 class DecoderRNN(nn.Module):
     def __init__(self, embed_size, hidden_size, vocab_size, num_layers, max_seq_length=20):
         """Set the hyper-parameters and build the layers."""
