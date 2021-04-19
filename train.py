@@ -54,7 +54,7 @@ def main():
 			# Forward, backward and optimize
 			encoder.create_forward_hooks(layers)
 			# features = encoder(images) 
-			features = icnn_encoder(Variable(images), category, torch.Tensor([epoch + 1]),torch.mean(torch.from_numpy(np.arange(1,80)).float())) #encoder(images)
+			features = icnn_encoder(Variable(images), categories, torch.Tensor([epoch + 1]),torch.mean(torch.from_numpy(np.arange(1,80)).float())) #encoder(images)
 			summary(icnn_encoder, (3,7,7))
 			layer_features = [encoder.extract_layer_features(i) for i in layers]
 			encoder.close_forward_hooks()
