@@ -1,7 +1,7 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-import torchvisions.models as model
+import torchvision.models as model
 import torchvision.models.resnet as resnet
 from torchvision.models.utils import load_state_dict_from_url
 from torch.nn.utils.rnn import pack_padded_sequence
