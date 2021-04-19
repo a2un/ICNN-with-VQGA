@@ -30,7 +30,7 @@ class EncoderCNN(nn.Module):
         self.bn = nn.BatchNorm1d(embed_size, momentum=0.01)
      
     def __call__(self, inputs):
-        super().__call__(torch.unsqueeze(inputs,0))
+        # super().__call__(torch.unsqueeze(inputs,0))
         return self.activation.features
     
     # Pass a list of ints representing the modules of the encoder for which you want to extract features
