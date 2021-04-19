@@ -1,8 +1,8 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-import torchvision.models as model
-import torchvision.models.resnet as resnet
+import torchvision.models as models
+# import torchvision.models.resnet as resnet
 from torchvision.models.utils import load_state_dict_from_url
 from torch.nn.utils.rnn import pack_padded_sequence
 from icnn_resnet_18.resnet_18 import resnet_18
@@ -22,7 +22,7 @@ class SaveFeatures:
 class EncoderCNN(nn.Module):
     def __init__(self, embed_size):
         super(EncoderCNN, self).__init__()
-        resnet = resnet18(pretrained=True)
+        resnet = models.resnet18(pretrained=True)
         self.modules = list(resnet.children())[:-1]      # delete the last fc layer.
         for i in range(len(self.modules)):
             self.modules[i] = self.modules[i].to(device)
