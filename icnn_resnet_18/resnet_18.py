@@ -7,6 +7,7 @@ import scipy.io as io
 import numpy as np
 import torch
 import torch.nn as nn
+import torchvision.models.resnet as resnet
 import torch.nn.functional as F
 from scipy.io import loadmat
 from torch.autograd import Function
@@ -354,7 +355,7 @@ class BasicBlock(nn.Module):
         return out
 
 
-class resnet_18(nn.Module):
+class resnet_18(resnet.ResNet):
     def __init__(self, pretrain_path,num_classes,dropout_rate,losstype,block=BasicBlock,  layers=[2,2,2,2], zero_init_residual=False,
                  groups=1, width_per_group=64, replace_stride_with_dilation=None,
                  norm_layer=None):
