@@ -505,8 +505,8 @@ class resnet_18(nn.Module):
     # def forward(self, x):
     #     return self._forward_impl(x), None
 
-    def __call__(self, inputs):
-        super().__call__(inputs)
+    def __call__(self, inputs, label, Iter, density):
+        super().__call__(inputs, label, Iter, density)
         return self.activation.features
 
         # Pass a list of ints representing the modules of the encoder for which you want to extract features
