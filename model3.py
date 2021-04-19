@@ -68,7 +68,7 @@ class Attention(nn.Module):
         device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
         att1 = self.encoder_att.to(device)(encoder_out)                    
         att2 = self.decoder_att.to(device)(decoder_hidden)                 
-        # print("attention encoder",att1.size(), "attention decoder", att2.size())
+        print("attention encoder",att1.mean(dim=0).mean(dim=0).size(), "attention decoder", att2.mean(dim=0).size())
         att = self.full_att.to(device)(att1.mean(dim=0).mean(dim=0) + att2)
         # print("full att", att)
         alpha = self.softmax(att)                                 
