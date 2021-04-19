@@ -44,7 +44,7 @@ def main():
 	total_step = len(data_loader)
 	category_id_idx = int(config['categories'][args.categoryname])
 	for epoch in range(1,config['num_epochs']+1):
-		for i, (images, questions, lengths) in enumerate(data_loader):	
+		for i, (images, categories, questions, lengths) in enumerate(data_loader):	
 			# Set mini-batch dataset
 			images = images.to(device)
 			questions = questions.to(device)
