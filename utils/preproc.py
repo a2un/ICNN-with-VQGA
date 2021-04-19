@@ -73,7 +73,7 @@ def proc(args, mode, root_dir, file_name):
     encoder = EncoderCNN()
     decoder = DecoderRNN(embed_size, hidden_size, batch_size, len(vocab), num_layers)
     
-    pretrain_path = './icnn_resnet_18/resnet18-5c106cde.pth'
+    pretrain_path = '/content/CS2770-Spring-2021-Project/icnn_resnet_18/resnet18-5c106cde.pth'
     icnn_encoder = resnet_18(pretrain_path,1,0,'logistic')        #resnet_18(pretrain_path, label_num, dropoutrate, losstype)
 
     return encoder, icnn_encoder, decoder, data_loader, c
