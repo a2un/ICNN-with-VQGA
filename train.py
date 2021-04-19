@@ -34,7 +34,7 @@ def main():
 
 	# Train the models
 	total_step = len(data_loader)
-	category_id_idx = int(config['categories'][args.categoryname])
+	# category_id_idx = int(config['categories'][args.categoryname])
 	for epoch in range(1,config['num_epochs']+1):
 		for i, (images, categories, questions, lengths) in enumerate(data_loader):
 			# Set mini-batch dataset
