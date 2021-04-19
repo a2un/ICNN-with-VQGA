@@ -66,7 +66,8 @@ def main():
 			encoder.create_forward_hooks(layers)
 			# features = encoder(images) 
 			features = icnn_encoder(Variable(images), categories, torch.Tensor([epoch + 1]),density)
-			summary(icnn_encoder, (3,7,7))
+			# summary(encoder, (3,7,7))
+			summary(icnn_encoder, (3,7,7),categories.cpu().detach().numpy().shape, np.array([epoch+1]).shape,tuple(density.size())))
 			layer_features = [encoder.extract_layer_features(i) for i in layers]
 			encoder.close_forward_hooks()
 			outputs = decoder(layer_features, questions, lengths)
