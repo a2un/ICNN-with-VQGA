@@ -34,19 +34,19 @@ for epoch in range(1,config['num_epochs']+1):
     for i, (images, categories, questions, lengths) in enumerate(data_loader):
 
         # for image, category_list, question in zip(images, categories, questions):
-		image = image.to(device)
-		category_list = category_list.to(device)
-		question = question.to(device)
-			
-		# Forward, backward and optimize
-		features = encoder(image)
-		outputs = decoder(features, question, len(question))
-		loss = criterion(outputs, targets)
-		decoder.zero_grad()
-		encoder.zero_grad()
-		loss.backward()
+            images = images.to(device)
+            category_list = category_list.to(device)
+            question = question.to(device)
+                
+            # Forward, backward and optimize
+            features = encoder(image)
+            outputs = decoder(features, question, len(question))
+            loss = criterion(outputs, targets)
+            decoder.zero_grad()
+            encoder.zero_grad()
+            loss.backward()
             
-        optimizer.step()
+        	optimizer.step()
 
         # Print log info
         if i % config['log_step'] == 0:
