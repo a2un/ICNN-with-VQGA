@@ -13,10 +13,10 @@ parser.add_argument('--config', type=pathlib.Path, default='config.ini', help='T
 args = parser.parse_args()
 root_dir = os.path.dirname(os.path.realpath(__file__))
 
-encoder, icnn_encoder, decoder, data_loader, config = proc(args, 'val', root_dir, 'validate.py')
+icnn_encoder, decoder, data_loader, config = proc(args, 'val', root_dir, 'validate.py')
 
 # Make sure that models exist that we are validating
-encoder_path = {}
+# encoder_path = {}
 decoder_path = {}
 icnn_encoder_path = {}
 
@@ -30,7 +30,7 @@ for epoch in range(1,config['num_epochs']+1):
 	
 
 # Put models on device
-encoder = encoder.to(device)
+# encoder = encoder.to(device)
 decoder = decoder.to(device)
 icnn_encoder = icnn_encoder.to(device)
 # Validate

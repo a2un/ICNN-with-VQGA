@@ -28,14 +28,14 @@ def main():
 	args = parser.parse_args()
 	root_dir = os.path.dirname(os.path.realpath(__file__))
 
-	encoder, icnn_encoder, decoder, data_loader, config = proc(args, 'train', root_dir, 'train.py')
+	icnn_encoder, decoder, data_loader, config = proc(args, 'train', root_dir, 'train.py')
 
 	# Create model directory
 	if not os.path.exists(config['model_dir']):
 		os.makedirs(config['model_dir'])
 
 	# Put models on device
-	encoder = encoder.to(device)
+	# encoder = encoder.to(device)
 	decoder = decoder.to(device)
 	icnn_encoder = icnn_encoder.to(device)
 
@@ -73,7 +73,7 @@ def main():
 			outputs = decoder(layer_features, questions, lengths)
 			loss = criterion(outputs, targets)
 			decoder.zero_grad()
-			encoder.zero_grad()
+			icnn_encoder.zero_grad()
 			loss.backward()
 			optimizer.step()
 

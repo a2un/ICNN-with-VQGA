@@ -48,7 +48,7 @@ if __name__ == '__main__':
 	args = parser.parse_args()
 	root_dir = os.path.dirname(os.path.realpath(__file__))
 
-	encoder, icnn_encoder, decoder, data_loader, config = proc(args, 'test', root_dir, 'test.py')
+	icnn_encoder, decoder, data_loader, config = proc(args, 'test', root_dir, 'test.py')
 
 	icnn_encoder_path = os.path.join(config['model_dir'], 'best_encoder.pth')
 	decoder_path = os.path.join(config['model_dir'], 'best_decoder.pth')
@@ -57,7 +57,7 @@ if __name__ == '__main__':
 	if not os.path.exists(decoder_path):
 		raise Exception(f'Decoder does not exist: {decoder_path}')
 	
-	encoder = encoder.to(device)
+	# encoder = encoder.to(device)
 	decoder = decoder.to(device)
 	icnn_encoder = icnn_encoder.to(device)
 	icnn_encoder.load_state_dict(torch.load(icnn_encoder_path))

@@ -76,4 +76,4 @@ def proc(args, mode, root_dir, file_name):
     pretrain_path = '/content/CS2770-Spring-2021-Project/icnn_resnet_18/resnet18-5c106cde.pth'
     icnn_encoder = resnet_18(pretrain_path,1,0,'logistic')        #resnet_18(pretrain_path, label_num, dropoutrate, losstype)
 
-    return encoder, icnn_encoder, decoder, data_loader, c
+    return icnn_encoder, decoder, data_loader, c
