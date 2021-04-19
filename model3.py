@@ -68,11 +68,11 @@ class Attention(nn.Module):
         device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
         att1 = self.encoder_att.to(device)(encoder_out)                    # (batch_size, -1, embed_size)
         att2 = self.decoder_att.to(device)(decoder_hidden)                 # (batch_size, hidden_size)
-        print("attention encoder",att1.size(), "attention decoder", att2.size())
+        # print("attention encoder",att1.size(), "attention decoder", att2.size())
         att = self.full_att.to(device)(att1.mean(dim=0).mean(dim=0).mean(dim=0) + att2.mean(dim=0))                          # (batch_size, hidden_size)
-        print("full att", att)
-        # alpha = self.softmax(att)                                 # (hidden_size, 1)
-        attention_weighted_encoding = (att * encoder_out.mean())#.sum()  #  (batch_size, hidden_size)
+        # print("full att", att)
+        alpha = self.softmax(att)                                 # (hidden_size, 1)
+        attention_weighted_encoding = (alpha * encoder_out.mean())#.sum()  #  (batch_size, hidden_size)
 
         return attention_weighted_encoding
 
@@ -106,7 +106,7 @@ class DecoderRNN(nn.Module):
         # embeddings = torch.cat((features.unsqueeze(1), embeddings), 1)
         packed = pack_padded_sequence(embeddings, lengths.flatten(), batch_first=True) 
         self.h, self.c = self.lstm(packed)
-        self.attention(layer_features, self.h[0])
+        print("final att insider decoder forward",self.attention(layer_features, self.h[0]).size())
         attention_weighted_encoding = self.h[0]#
         # attention_weighted_encoding = self.sigmoid(self.h[0]) * attention_weighted_encoding
         outputs = self.linear(attention_weighted_encoding)
