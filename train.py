@@ -53,9 +53,9 @@ def main():
 			# print("category shape",categories.size())
 			# Forward, backward and optimize
 			encoder.create_forward_hooks(layers)
-			features = encoder(images) 
-			#features = icnn_encoder(Variable(images), category, torch.Tensor([epoch + 1]),torch.mean(torch.from_numpy(np.arange(1,80)).float())) #encoder(images)
-			# summary(icnn_encoder, (3,7,7))
+			# features = encoder(images) 
+			features = icnn_encoder(Variable(images), category, torch.Tensor([epoch + 1]),torch.mean(torch.from_numpy(np.arange(1,80)).float())) #encoder(images)
+			summary(icnn_encoder, (3,7,7))
 			layer_features = [encoder.extract_layer_features(i) for i in layers]
 			encoder.close_forward_hooks()
 			outputs = decoder(layer_features, questions, lengths)
