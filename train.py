@@ -41,13 +41,13 @@ def main():
 
 	# Loss and optimizer
 	criterion = nn.CrossEntropyLoss()
-	params = list(decoder.parameters())# + list(encoder.linear.parameters()) + list(encoder.bn.parameters())
+	params = list(decoder.parameters()) + list(encoder.linear.parameters()) + list(encoder.bn.parameters())
 	optimizer = torch.optim.Adam(params, lr=config['learning_rate'])
 
 	# Train the models
 	total_step = len(data_loader)
-	layers = list(range(1,19))
-	# category_id_idx = int(config['categories'][args.categoryname])
+	layers = [9,11]				## mask layers
+
 	for epoch in range(1,config['num_epochs']+1):
 		for i, (images, categories, questions, lengths) in enumerate(data_loader):
 			# Set mini-batch dataset

@@ -97,8 +97,8 @@ class DecoderRNN(nn.Module):
         """Decode image feature vectors and generates captions."""
         embeddings = self.embed(captions)
         layer_features_l = [l.size(2) for l in layer_features]
-        m = max(layer_features_l)
-        layer_features = [pad(l,(int((m-l.size(2))/2),int((m-l.size(2))/2),int((m-l.size(2))/2),int((m-l.size(2))/2))) if l.size(2) < m else l for l in layer_features]
+        encoder_dim = max(layer_features_l)
+        layer_features = [pad(l,(int((encoder_dim-l.size(2))/2),int((encoder_dim-l.size(2))/2),int((encoder_dim-l.size(2))/2),int((encoder_dim-l.size(2))/2))) if l.size(2) < m else l for l in layer_features]
         layer_features = torch.cat(layer_features)
         # print("layer_features size", layer_features[0].size())
         # embeddings = torch.cat((features.unsqueeze(1), embeddings), 1)
