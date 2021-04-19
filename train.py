@@ -46,7 +46,7 @@ def main():
 
 	# Train the models
 	total_step = len(data_loader)
-	layers = [1,2,3,4] 
+	layers = list(range(1,19))
 	# category_id_idx = int(config['categories'][args.categoryname])
 	for epoch in range(1,config['num_epochs']+1):
 		for i, (images, categories, questions, lengths) in enumerate(data_loader):
@@ -68,7 +68,7 @@ def main():
 			features = icnn_encoder(Variable(images), categories, torch.Tensor([epoch + 1]),density)
 			# summary(encoder, (3,7,7))
 			# summary(icnn_encoder, ((3,7,7),categories.size(), torch.Tensor([epoch + 1]).size(),density.size()))
-			layer_features = [icnn_encoder.extract_layer_features(i) for i in layers]
+			layer_features = torch.from_numpy(np.array([icnn_encoder.extract_layer_features(i) for i in layers]))
 			icnn_encoder.close_forward_hooks()
 			outputs = decoder(layer_features, questions, lengths)
 			loss = criterion(outputs, targets)
