@@ -66,13 +66,13 @@ class Attention(nn.Module):
         :return: attention weighted encoding, weights
         """
         device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-        att1 = self.encoder_att.to(device)(encoder_out)                    # (batch_size, -1, embed_size)
-        att2 = self.decoder_att.to(device)(decoder_hidden)                 # (batch_size, hidden_size)
+        att1 = self.encoder_att.to(device)(encoder_out)                    
+        att2 = self.decoder_att.to(device)(decoder_hidden)                 
         # print("attention encoder",att1.size(), "attention decoder", att2.size())
-        att = self.full_att.to(device)(att1.mean(dim=0).mean(dim=0).mean(dim=0) + att2.mean(dim=0))                          # (batch_size, hidden_size)
+        att = self.full_att.to(device)(att1.mean(dim=0).mean(dim=0) + att2)
         # print("full att", att)
-        alpha = self.softmax(att)                                 # (hidden_size, 1)
-        attention_weighted_encoding = (alpha * encoder_out.mean())#.sum()  #  (batch_size, hidden_size)
+        alpha = self.softmax(att)                                 
+        attention_weighted_encoding = (alpha * encoder_out.mean()).sum()  
 
         return attention_weighted_encoding
 
