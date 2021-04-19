@@ -101,12 +101,12 @@ class DecoderRNN(nn.Module):
         encoder_dim = max(layer_features_l)
         layer_features = [pad(l,(int((encoder_dim-l.size(2))/2),int((encoder_dim-l.size(2))/2),int((encoder_dim-l.size(2))/2),int((encoder_dim-l.size(2))/2))) if l.size(2) < encoder_dim else l for l in layer_features]
         layer_features = torch.cat(layer_features)
-        self.attention = Attention(encoder_dim,self.hidden_size,self.hidden_size)
+        attention = Attention(encoder_dim,self.hidden_size,self.hidden_size)
         # print("layer_features size", layer_features[0].size())
         # embeddings = torch.cat((features.unsqueeze(1), embeddings), 1)
         packed = pack_padded_sequence(embeddings, lengths.flatten(), batch_first=True) 
         self.h, self.c = self.lstm(packed)
-        attention_weighted_encoding = self.attention(layer_features, self.h[0])
+        attention_weighted_encoding = attention(layer_features, self.h[0])
         # attention_weighted_encoding = self.h[0]#
         attention_weighted_encoding = attention_weighted_encoding * self.sigmoid(self.h[0])
         outputs = self.linear(attention_weighted_encoding)
