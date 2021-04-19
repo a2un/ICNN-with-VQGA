@@ -83,7 +83,8 @@ def main():
 					.format(epoch, config['num_epochs'], i, total_step, loss.item(), np.exp(loss.item()))) 
 			
 		torch.save(decoder.state_dict(), os.path.join(config['model_dir'], f'decoder-{epoch}.pth'))
-		torch.save(encoder.state_dict(), os.path.join(config['model_dir'], f'encoder-{epoch}.pth'))
+		# torch.save(encoder.state_dict(), os.path.join(config['model_dir'], f'encoder-{epoch}.pth'))
+		torch.save(icnn_encoder.state_dict(), os.path.join(config['model_dir'], f'icnn-encoder-{epoch}.pth'))
 
 
 if __name__ == "__main__": main()
