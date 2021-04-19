@@ -9,6 +9,15 @@ from icnn_resnet_18 import resnet_18
 # Device configuration
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
+
+def get_density(label):
+    if label.shape[1]>1:
+        label = torch.from_numpy(label[:,:,0,0])
+        density = torch.mean((label>0).float(),0)
+    else:
+        density = torch.Tensor([0])
+    return density
+
 def main():
 	# Config options
 	parser = argparse.ArgumentParser(description='CS2770 Project Train')
