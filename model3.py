@@ -18,12 +18,15 @@ class SaveFeatures:
         self.hook.remove()
 
 # This is a simple model that returns that last fully-connected layer of a Resnet 18 CNN      
-class EncoderCNN(resnet.ResNet):
+class EncoderCNN(resnet.resnet18):
     def __init__(self):
         super().__init__(resnet.BasicBlock, [2, 2, 2, 2])
-        state_dict = load_state_dict_from_url(resnet.model_urls['resnet18'], progress=True)
-        self.load_state_dict(state_dict)
-        self.activation = SaveFeatures(list(self.children())[-1])
+        resnet = resnet18(pretrained=True)
+        self.modules = list(resnet.children())[:-1]      # delete the last fc layer.
+        for i in range(len(self.modules)):
+            self.modules[i] = self.modules[i].to(device)
+        self.linear = nn.Linear(2048, embed_size)
+        self.bn = nn.BatchNorm1d(embed_size, momentum=0.01)
      
     def __call__(self, inputs):
         super().__call__(torch.unsqueeze(inputs,0))

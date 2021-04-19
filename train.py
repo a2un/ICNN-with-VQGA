@@ -44,23 +44,19 @@ def main():
 	total_step = len(data_loader)
 	category_id_idx = int(config['categories'][args.categoryname])
 	for epoch in range(1,config['num_epochs']+1):
-		for i, (images, categories, questions, lengths) in enumerate(data_loader):
-			density = get_density(categories.cpu().detach().numpy())
-			targets = pack_padded_sequence(questions, lengths, batch_first=True, enforce_sorted = False)[0]
-			for image, category_list, question in zip(images, categories, questions):
-				image = image.to(device)
-				category_list = category_list.to(device)
-				question = question.to(device)
-				# Forward, backward and optimize
-				features = encoder(image)
-				questions = questions.to(device)
-				lengths = torch.from_numpy(np.array([len(question) for question in questions]))
-				lenghts = lengths.to(device)
-				outputs = decoder(features, questions, lengths)
-				loss = criterion(outputs, targets)
-				decoder.zero_grad()
-				encoder.zero_grad()
-				loss.backward()
+		for i, (images, categories, questions, lengths) in enumerate(data_loader):	
+			# Set mini-batch dataset
+			images = images.to(device)
+			questions = questions.to(device)
+			targets = pack_padded_sequence(questions, lengths, batch_first=True)[0]
+			
+			# Forward, backward and optimize
+			features = encoder(images)
+			outputs = decoder(features, questions, lengths)
+			loss = criterion(outputs, targets)
+			decoder.zero_grad()
+			encoder.zero_grad()
+			loss.backward()
 			optimizer.step()
 
 			# Print log info
