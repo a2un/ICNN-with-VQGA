@@ -102,7 +102,7 @@ class DecoderRNN(nn.Module):
         layer_features_pad = []
         for l in layer_features:
             if l.size(2) < m:
-                pad(l,(m-l.size(2),m-l.size(2),m-l.size(2),m-l.size(2)))
+                l = pad(l,(m-l.size(2),m-l.size(2),m-l.size(2),m-l.size(2)))
                 print(l.size())
             else:
                 print("no pad",l.size())
