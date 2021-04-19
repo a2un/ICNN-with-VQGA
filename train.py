@@ -28,7 +28,8 @@ def main():
 	# Put models on device
 	encoder = encoder.to(device)
 	decoder = decoder.to(device)
-
+	icnn_encoder = icnn_encoder.to(device)
+	
 	# Loss and optimizer
 	criterion = nn.CrossEntropyLoss()
 	params = list(decoder.parameters())# + list(encoder.linear.parameters()) + list(encoder.bn.parameters())
@@ -47,6 +48,7 @@ def main():
 			images = images.to(device)
 			questions = questions.to(device)
 			categories = categories.to(device)
+			density = get_density(categories.cpu().detach().numpy())
 			# category = np.array([category_list[category_id_idx] for category_list in categories])
 			# category  = torch.from_numpy(category.reshape((1,category.shape[0],1,1))).to(device)
 			lengths = torch.Tensor(np.array(lengths).reshape((len(lengths),1)))
@@ -54,7 +56,7 @@ def main():
 			# Forward, backward and optimize
 			encoder.create_forward_hooks(layers)
 			# features = encoder(images) 
-			features = icnn_encoder(Variable(images), categories, torch.Tensor([epoch + 1]),torch.mean(torch.from_numpy(np.arange(1,80)).float())) #encoder(images)
+			features = icnn_encoder(Variable(images), categories, torch.Tensor([epoch + 1]),density))
 			summary(icnn_encoder, (3,7,7))
 			layer_features = [encoder.extract_layer_features(i) for i in layers]
 			encoder.close_forward_hooks()

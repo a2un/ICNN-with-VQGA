@@ -12,6 +12,13 @@ from scipy.io import loadmat
 from torch.autograd import Function
 from torch.nn.parameter import Parameter
 
+class SaveFeatures:
+    def __init__(self, module):
+        self.hook = module.register_forward_hook(self.hook_fn)
+    def hook_fn(self, module, input, output):
+        self.features = output.clone().detach()
+    def close(self):
+        self.hook.remove()
 
 class Divclass:
     def __init__(self, depthList, posList):
