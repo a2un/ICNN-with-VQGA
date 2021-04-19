@@ -505,6 +505,10 @@ class resnet_18(nn.Module):
     # def forward(self, x):
     #     return self._forward_impl(x), None
 
+    def __call__(self, inputs):
+        super().__call__(inputs)
+        return self.activation.features
+
         # Pass a list of ints representing the modules of the encoder for which you want to extract features
     def create_forward_hooks(self, layer_list):
         modules = list(self.modules())
