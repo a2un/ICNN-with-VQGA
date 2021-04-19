@@ -63,14 +63,14 @@ def main():
 			lengths = torch.Tensor(np.array(lengths).reshape((len(lengths),1)))
 			# print("category shape",categories.size())
 			# Forward, backward and optimize
-			encoder.create_forward_hooks(layers)
+			icnn_encoder.create_forward_hooks(layers)
 			# features = encoder(images) 
 			features = icnn_encoder(Variable(images), categories, torch.Tensor([epoch + 1]),density)
 			# summary(encoder, (3,7,7))
 			# summary(icnn_encoder, ((3,7,7),categories.size(), torch.Tensor([epoch + 1]).size(),density.size()))
-			# layer_features = [icnn_encoder.extract_layer_features(i) for i in layers]
-			# icnn_encoder.close_forward_hooks()
-			outputs = decoder(features, questions, lengths)
+			layer_features = [icnn_encoder.extract_layer_features(i) for i in layers]
+			icnn_encoder.close_forward_hooks()
+			outputs = decoder(layer_features, questions, lengths)
 			loss = criterion(outputs, targets)
 			decoder.zero_grad()
 			encoder.zero_grad()

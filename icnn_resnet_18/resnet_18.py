@@ -426,6 +426,7 @@ class resnet_18(nn.Module):
                     nn.init.constant_(m.bn2.weight, 0)
 
         self.init_weight()
+        self.activation = SaveFeatures(list(self.children())[-1])
 
     def _make_layer(self, block, planes, blocks, stride=1, dilate=False):
         norm_layer = self._norm_layer
@@ -503,4 +504,18 @@ class resnet_18(nn.Module):
         return x
     # def forward(self, x):
     #     return self._forward_impl(x), None
+
+        # Pass a list of ints representing the modules of the encoder for which you want to extract features
+    def create_forward_hooks(self, layer_list):
+        modules = list(self.modules())
+        self.activations = {i: SaveFeatures(modules[i]) for i in layer_list}
+    
+    # Pass the int value of the layer for which you want a feature map.  Only call this after passing 
+    # inputs to the encoder and you will get the output associated with those inputs
+    def extract_layer_features(self, layer):
+        return self.activations[layer].features
+    
+    def close_forward_hooks(self):
+        for activation in self.activations.values():
+            activation.close()
 
