@@ -47,7 +47,7 @@ class EncoderCNN(nn.Module):
         for activation in self.activations.values():
             activation.close()
     
-        def forward(self, images):
+    def forward(self, images):
         """Extract feature vectors from input images."""
         with torch.no_grad():
         
