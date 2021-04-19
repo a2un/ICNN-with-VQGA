@@ -1,6 +1,7 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+import torchvisions.models as model
 import torchvision.models.resnet as resnet
 from torchvision.models.utils import load_state_dict_from_url
 from torch.nn.utils.rnn import pack_padded_sequence
@@ -18,7 +19,7 @@ class SaveFeatures:
         self.hook.remove()
 
 # This is a simple model that returns that last fully-connected layer of a Resnet 18 CNN      
-class EncoderCNN(resnet.resnet18):
+class EncoderCNN(nn.Module):
     def __init__(self):
         super().__init__(resnet.BasicBlock, [2, 2, 2, 2])
         resnet = resnet18(pretrained=True)
