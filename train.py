@@ -51,7 +51,8 @@ def main():
 			targets = pack_padded_sequence(questions, lengths, batch_first=True)[0]
 			
 			# Forward, backward and optimize
-			features = encoder(images.squeeze(0))
+			print(images.squeeze(0).size())
+			features = encoder(images)
 			outputs = decoder(features, questions, lengths)
 			loss = criterion(outputs, targets)
 			decoder.zero_grad()
