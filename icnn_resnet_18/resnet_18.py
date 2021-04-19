@@ -359,7 +359,7 @@ class resnet_18(resnet.ResNet):
     def __init__(self, pretrain_path,num_classes,dropout_rate,losstype,block=BasicBlock,  layers=[2,2,2,2], zero_init_residual=False,
                  groups=1, width_per_group=64, replace_stride_with_dilation=None,
                  norm_layer=None):
-        super(resnet_18, self).__init__()
+        super(resnet_18, self).__init__(resnet.BasicBlock, [2, 2, 2, 2])
         if norm_layer is None:
             norm_layer = nn.BatchNorm2d
         self.label_num = num_classes
