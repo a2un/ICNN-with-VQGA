@@ -3,7 +3,6 @@ from model3 import EncoderCNN, DecoderRNN
 from torchvision import transforms
 from utils.vocab import Vocabulary
 from utils.data_loader import get_loader 
-from icnn_resnet_18.resnet_18 import resnet_18
 
 def get_transform(crop_size):
     return transforms.Compose([
@@ -72,8 +71,5 @@ def proc(args, mode, root_dir, file_name):
     # Build the models
     encoder = EncoderCNN()
     decoder = DecoderRNN(embed_size, hidden_size, batch_size, len(vocab), num_layers)
-    
-    pretrain_path = '/content/CS2770-Spring-2021-Project/icnn_resnet_18/resnet18-5c106cde.pth'
-    icnn_encoder = resnet_18(pretrain_path,1,0,'logistic')        #resnet_18(pretrain_path, label_num, dropoutrate, losstype)
 
-    return icnn_encoder, decoder, data_loader, c
+    return encoder, decoder, data_loader, c
