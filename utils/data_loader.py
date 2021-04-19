@@ -5,6 +5,9 @@ from PIL import Image
 from utils.vocab import Vocabulary, tokenize
 
 class VQGDataset(data.Dataset):
+
+    CAT_IDS = [1, 62, 3, 67, 47]
+    
     def __init__(self, img_dir, data_file, data_set, vocab, transform=None):
         """Set the path for images, captions and vocabulary wrapper.
         
@@ -17,6 +20,7 @@ class VQGDataset(data.Dataset):
         self.img_dir = img_dir
         self.vocab = vocab
         self.transform = transform
+        self.categories = []
         self.questions = []
         self.images = []
         self.img_to_url = {}
@@ -29,19 +33,27 @@ class VQGDataset(data.Dataset):
             raise Exception(f'VQGDataset.init: data_set must be vqa or vqg, found {data_set}')
         
         with open(data_file) as f:
-            for line in f.readlines():
+            for line in f.readlines()[1:]:
                 row_data = line.split('\t')
                 img_id = row_data[0]
                 img_url = row_data[2]
+                cat_set = set([int(i) for i in row_data[3].split('---')])
+                cat_list = []
+                for cat in VQGDataset.CAT_IDS:
+                    cat_list.append(1 if cat in cat_set else -1)
+                category = cat_list[0]  # We are only doing the Person category right now
                 questions = row_data[q_row].split('---')
                 self.img_to_url[img_id] = img_url
                 
                 for question in questions:
+                    #self.categories.append(cat_list)
+                    self.categories.append(category)
                     self.questions.append(question)
                     self.images.append(img_id)
-                    
+                 
     def __getitem__(self, index):
         """Returns one data pair (image and question)."""
+        category = self.categories[index]
         question = self.questions[index]
         img_id = self.images[index]
         img_file_path = os.path.join(self.img_dir, img_id)
@@ -58,42 +70,33 @@ class VQGDataset(data.Dataset):
         target = [self.vocab('<start>')]
         target.extend([self.vocab(token) for token in tokenize(question)])
         target.append(self.vocab('<end>'))
-        target = torch.Tensor(target)
-        return image, target
+        return image, category, torch.Tensor(target)
 
     def __len__(self):
         return len(self.questions)
 
-
 def collate_fn(data):
-    """Creates mini-batch tensors from the list of tuples (image, caption).
-    
-    We should build custom collate_fn rather than using default collate_fn, 
-    because merging caption (including padding) is not supported in default.
-    Args:
-        data: list of tuple (image, caption). 
-            - image: torch tensor of shape (3, 256, 256).
-            - caption: torch tensor of shape (?); variable length.
-    Returns:
-        images: torch tensor of shape (batch_size, 3, 256, 256).
-        targets: torch tensor of shape (batch_size, padded_length).
-        lengths: list; valid length for each padded caption.
-    """
-    # Sort a data list by caption length (descending order).
-    data.sort(key=lambda x: len(x[1]), reverse=True)
-    images, captions = zip(*data)
+    # Sort a data list by question length (descending order).
+    data.sort(key=lambda x: len(x[2]), reverse=True)
+    images, categories, questions = zip(*data)
 
     # Merge images (from tuple of 3D tensor to 4D tensor).
     images = torch.stack(images, 0)
+    
+    # Merge categories into a 4D tensor
+    categories = torch.Tensor(categories)
+    categories = torch.unsqueeze(categories, 1)
+    categories = torch.unsqueeze(categories, 1)
+    categories = torch.unsqueeze(categories, 1)
 
     # Merge captions (from tuple of 1D tensor to 2D tensor).
-    lengths = [len(cap) for cap in captions]
-    targets = torch.zeros(len(captions), max(lengths)).long()
-    for i, cap in enumerate(captions):
+    lengths = [len(q) for q in questions]
+    targets = torch.zeros(len(questions), max(lengths)).long()
+    for i, q in enumerate(questions):
         end = lengths[i]
-        targets[i, :end] = cap[:end]        
-    return images, targets, lengths
-
+        targets[i, :end] = q[:end]        
+    return images, categories, targets, lengths
+    
 def get_loader(img_dir, data_file, data_set, vocab, transform, batch_size, shuffle, num_workers):
     """Returns torch.utils.data.DataLoader for custom dataset."""
 
