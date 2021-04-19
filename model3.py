@@ -46,6 +46,43 @@ class EncoderCNN(nn.Module):
     def close_forward_hooks(self):
         for activation in self.activations.values():
             activation.close()
+    
+        def forward(self, images):
+        """Extract feature vectors from input images."""
+        with torch.no_grad():
+        
+            """ This was the set-up from the inception_v3 model
+            x = self.modules[0](images)
+            x = self.modules[1](x)
+            x = self.modules[2](x)
+            x = F.max_pool2d(x, kernel_size=3, stride=2)
+            x = self.modules[3](x)
+            x = self.modules[4](x)
+            x = F.max_pool2d(x, kernel_size=3, stride=2)
+            x = self.modules[5](x)
+            x = self.modules[6](x)
+            x = self.modules[7](x)
+            x = self.modules[8](x)
+            x = self.modules[9](x)
+            x = self.modules[10](x)
+            x = self.modules[11](x)
+            x = self.modules[12](x)
+            x = self.modules[14](x)
+            x = self.modules[15](x)
+            x = self.modules[16](x)
+            x = F.avg_pool2d(x, kernel_size=8)
+            x = x.view(x.size(0), -1)    
+            """
+            
+            x = self.modules[0](images)
+            x = F.max_pool2d(x, kernel_size=3, stride=2)
+            for i in range(1,len(self.modules)-1):	# I cut off the last layer because it was reducing the size of the matrix to 1x1
+                x = self.modules[i](x)
+            x = F.avg_pool2d(x, kernel_size=2)
+            x = x.view(x.size(0), -1)
+            
+        features = self.bn(self.linear(x))
+        return features
 
 class Attention(nn.Module):
     """
