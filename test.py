@@ -9,7 +9,7 @@ def get_density(label):
         density = torch.Tensor([0])
     return density
 
-def test(encoder, icnn_encoder, decoder, data_loader, id_to_word, epoch, doOutputQuestions=False):
+def test(icnn_encoder, decoder, data_loader, id_to_word, epoch, doOutputQuestions=False):
 	device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 	c = nltk.translate.bleu_score.SmoothingFunction()
 	
@@ -63,7 +63,7 @@ if __name__ == '__main__':
 	icnn_encoder.load_state_dict(torch.load(icnn_encoder_path))
 	decoder.load_state_dict(torch.load(decoder_path))
 
-	bleu_score = test(encoder, decoder, data_loader, config['id_to_word'], True)
+	bleu_score = test(encoder, decoder, data_loader, config['id_to_word'], epoch True)
 	print(f'Average bleu score for test set: {bleu_score}')
 
 
