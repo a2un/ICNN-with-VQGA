@@ -14,13 +14,14 @@ Contributions:
 ## Description
 This code trains, validates, and tests an end-to-end model for Visual Question Generation (VQG).
 
-With respect to the project, the final work remains to be done.  There may be additional work that we can do if we have time, but this is the minimum:
+[//]: <> (With respect to the project, the final work remains to be done.  There may be additional work that we can do if we have time, but this is the minimum:)
+[//]: <> (Integrate the interpretable CNN into the encoder.  Since the interpretable CNN is a categorization CNN that works with one category at a time, our project report suggested that we would actually make five CNNs, one for each of the top five categories in the COCO data set, and then combine their output encodings into one minimized vector.  It may also be necessary to simplify that architecture of the interpretable CNN since we will be training five of them in each training run.)
 
-* Integrate the interpretable CNN into the encoder.  Since the interpretable CNN is a categorization CNN that works with one category at a time, our project report suggested that we would actually make five CNNs, one for each of the top five categories in the COCO data set, and then combine their output encodings into one minimized vector.  It may also be necessary to simplify that architecture of the interpretable CNN since we will be training five of them in each training run.
-* Implement an attention mechanism to go between the encoder and decoder
-* Implement code that visualizes intermediate layers of the interpretable CNN so that we can analyze them as part of our results.  I'm thinking that we just randomly sample a subset of the test set for visualization.
-* Train, validate, and test versions of the model for the VQA and VQG data set
-* Create a slide presentation for 4/22
+[//]: <> (Implement an attention mechanism to go between the encoder and decoder)
+[//]: <> (Implement code that visualizes intermediate layers of the interpretable CNN so that we can analyze them as part of our results.  I'm thinking that we just randomly sample a subset of the test set for visualization.)
+[//]: <> (Train, validate, and test versions of the model for the VQA and VQG data set)
+[//]: <> (Create a slide presentation for 4/20)
+
 
 ## Data
 The file `data/data_files/all_data.txt` lists all relevant data for 2894 images from the COCO data set.  These 2894 images were selected because they meet two criteria:
