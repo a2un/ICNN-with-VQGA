@@ -47,10 +47,11 @@ def main():
 			# category = np.array([category_list[category_id_idx] for category_list in categories])
 			# category  = torch.from_numpy(category.reshape((1,category.shape[0],1,1))).to(device)
 			lengths = torch.Tensor(np.array(lengths).reshape((len(lengths),1)))
+			print("category shape",categories.size())
 			# Forward, backward and optimize
 			encoder.create_forward_hooks(layers)
 			features = encoder(images) #encoder(Variable(images), category, torch.Tensor([epoch + 1]),torch.mean(torch.from_numpy(np.arange(1,80)).float())) #encoder(images)
-			summary(encoder, (3,7,7))
+			# summary(encoder, (3,7,7))
 			layer_features = [encoder.extract_layer_features(i) for i in layers]
 			encoder.close_forward_hooks()
 			outputs = decoder(layer_features, questions, lengths)
