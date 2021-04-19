@@ -1,14 +1,8 @@
 import torch
 import torch.nn as nn
-import torch.nn.functional as F
-import torchvision.models as models
-# import torchvision.models.resnet as resnet
+import torchvision.models.resnet as resnet
 from torchvision.models.utils import load_state_dict_from_url
 from torch.nn.utils.rnn import pack_padded_sequence
-from icnn_resnet_18.resnet_18 import resnet_18
-
-# Device configuration
-device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 class SaveFeatures:
     def __init__(self, module):
@@ -19,19 +13,16 @@ class SaveFeatures:
         self.hook.remove()
 
 # This is a simple model that returns that last fully-connected layer of a Resnet 18 CNN      
-class EncoderCNN(nn.Module):
-    def __init__(self, embed_size):
-        super(EncoderCNN, self).__init__()
-        resnet = models.resnet18(pretrained=True)
-        self.modules = list(resnet.children())[:-1]      # delete the last fc layer.
-        for i in range(len(self.modules)):
-            self.modules[i] = self.modules[i].to(device)
-        self.linear = nn.Linear(2048, embed_size)
-        self.bn = nn.BatchNorm1d(embed_size, momentum=0.01)
+class EncoderCNN(resnet.ResNet):
+    def __init__(self):
+        super().__init__(resnet.BasicBlock, [2, 2, 2, 2])
+        state_dict = load_state_dict_from_url(resnet.model_urls['resnet18'], progress=True)
+        self.load_state_dict(state_dict)
+        self.activation = SaveFeatures(list(self.children())[-1])
      
-    # def __call__(self, inputs):
-    #     # super().__call__(torch.unsqueeze(inputs,0))
-    #     return self.activation.features
+    def __call__(self, inputs):
+        super().__call__(inputs)
+        return self.activation.features
     
     # Pass a list of ints representing the modules of the encoder for which you want to extract features
     def create_forward_hooks(self, layer_list):
@@ -46,80 +37,6 @@ class EncoderCNN(nn.Module):
     def close_forward_hooks(self):
         for activation in self.activations.values():
             activation.close()
-    
-    def forward(self, images):
-        """Extract feature vectors from input images."""
-        with torch.no_grad():
-        
-            """ This was the set-up from the inception_v3 model
-            x = self.modules[0](images)
-            x = self.modules[1](x)
-            x = self.modules[2](x)
-            x = F.max_pool2d(x, kernel_size=3, stride=2)
-            x = self.modules[3](x)
-            x = self.modules[4](x)
-            x = F.max_pool2d(x, kernel_size=3, stride=2)
-            x = self.modules[5](x)
-            x = self.modules[6](x)
-            x = self.modules[7](x)
-            x = self.modules[8](x)
-            x = self.modules[9](x)
-            x = self.modules[10](x)
-            x = self.modules[11](x)
-            x = self.modules[12](x)
-            x = self.modules[14](x)
-            x = self.modules[15](x)
-            x = self.modules[16](x)
-            x = F.avg_pool2d(x, kernel_size=8)
-            x = x.view(x.size(0), -1)    
-            """
-            
-            x = self.modules[0](images)
-            x = F.max_pool2d(x, kernel_size=3, stride=2)
-            for i in range(1,len(self.modules)-1):	# I cut off the last layer because it was reducing the size of the matrix to 1x1
-                x = self.modules[i](x)
-            x = F.avg_pool2d(x, kernel_size=2)
-            x = x.view(x.size(0), -1)
-            
-        features = self.bn(self.linear(x))
-        return features
-
-class Attention(nn.Module):
-    """
-    Attention Network.
-    """
-
-    def __init__(self, encoder_dim, decoder_dim, attention_dim):
-        """
-        :param encoder_dim: feature size 
-        :param decoder_dim: size of decoder's RNN
-        :param attention_dim: size of the attention network
-        """
-        super(Attention, self).__init__()
-        self.attention_dim = attention_dim
-        self.encoder_att = nn.Linear(encoder_dim,attention_dim)  # linear layer to transform encoded image
-        self.decoder_att = nn.Linear(decoder_dim,attention_dim)  # linear layer to transform decoder's output
-        self.full_att = nn.Linear(attention_dim, 1)  # linear layer to calculate values to be softmax-ed
-        self.relu = nn.ReLU()
-        self.softmax = nn.Softmax(dim=1)  # softmax layer to calculate weights
-
-    def forward(self, encoder_out, decoder_hidden):
-        """
-        Forward propagation.
-
-        :param encoder_out: encoded images, a tensor of dimension (batch_size, embed_size, hidden_size)
-        :param decoder_hidden: previous decoder output, a tensor of dimension (batch_size, hidden_size)
-        :return: attention weighted encoding, weights
-        """
-        att1 = self.encoder_att(encoder_out)  #(128, -1, 16)                  # (batch_size, -1, embed_size)
-        att2 = self.decoder_att(decoder_hidden)      #(1170,16)            # (vocab_size, hidden_size)
-        print("attention encoder",att1.size(), "attention decoder", att2.size())
-        att = self.full_att((att1 + att2).permute(1,0,2))                       # (batch_size, vocab_size, hidden_size/embed_size)
-        print("full att size", att.size(), "att", (att1 + att2).permute(1,0,2).size(),"attention dim",self.attention_dim)                      # (batch_size, hidden_size)
-        # alpha = self.softmax(att)                                 # (hidden_size, 1)
-        attention_weighted_encoding = (att * encoder_out)#.sum()  #  (batch_size, hidden_size)
-
-        return attention_weighted_encoding
 
 class DecoderRNN(nn.Module):
     def __init__(self, embed_size, hidden_size, vocab_size, num_layers, max_seq_length=20):
@@ -151,7 +68,6 @@ class DecoderRNN(nn.Module):
             inputs = self.embed(predicted)                       # inputs: (batch_size, embed_size)
             inputs = inputs.unsqueeze(1)                         # inputs: (batch_size, 1, embed_size)
         sampled_ids = torch.stack(sampled_ids, 1)                # sampled_ids: (batch_size, max_seq_length)
-        return sampled_ids
 
 class DecoderRNNWithAttention(nn.Module):
     def __init__(self, embed_size, hidden_size, batch_size, vocab_size, num_layers, max_seq_length=20):
