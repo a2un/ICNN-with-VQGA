@@ -3,6 +3,7 @@ import torch.nn as nn
 import torchvision.models.resnet as resnet
 from torchvision.models.utils import load_state_dict_from_url
 from torch.nn.utils.rnn import pack_padded_sequence
+from torch.nn.functional import pad
 
 class SaveFeatures:
     def __init__(self, module):
@@ -95,6 +96,9 @@ class DecoderRNN(nn.Module):
     def forward(self, layer_features, captions, lengths):
         """Decode image feature vectors and generates captions."""
         embeddings = self.embed(captions)
+        layer_features_l = [len(l) for l in layer_features]
+        m = max(layer_features_l)
+        layer_features = [pad(l,(m-l.size(),m-l.size(),m-l.size(),m-l.size()))] for l in layer_features if l.size() < m]
         layer_features = torch.cat(layer_features)
         # print("layer_features size", layer_features[0].size())
         # embeddings = torch.cat((features.unsqueeze(1), embeddings), 1)
