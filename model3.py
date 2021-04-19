@@ -108,7 +108,7 @@ class DecoderRNN(nn.Module):
         self.h, self.c = self.lstm(packed)
         attention_weighted_encoding = self.attention(layer_features, self.h[0]).size()
         # attention_weighted_encoding = self.h[0]#
-        attention_weighted_encoding = attention_weighted_encoding * self.h[0]
+        attention_weighted_encoding = attention_weighted_encoding[0] * self.h[0]
         outputs = self.linear(attention_weighted_encoding)
         # print("hidden size",attention_weighted_encoding.squeeze(2).size())
         # outputs = self.linear(attention_weighted_encoding)
