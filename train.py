@@ -29,7 +29,7 @@ def main():
 	encoder = encoder.to(device)
 	decoder = decoder.to(device)
 	icnn_encoder = icnn_encoder.to(device)
-	
+
 	# Loss and optimizer
 	criterion = nn.CrossEntropyLoss()
 	params = list(decoder.parameters())# + list(encoder.linear.parameters()) + list(encoder.bn.parameters())
@@ -56,7 +56,7 @@ def main():
 			# Forward, backward and optimize
 			encoder.create_forward_hooks(layers)
 			# features = encoder(images) 
-			features = icnn_encoder(Variable(images), categories, torch.Tensor([epoch + 1]),density))
+			features = icnn_encoder(Variable(images), categories, torch.Tensor([epoch + 1]),density)
 			summary(icnn_encoder, (3,7,7))
 			layer_features = [encoder.extract_layer_features(i) for i in layers]
 			encoder.close_forward_hooks()
