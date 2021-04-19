@@ -20,8 +20,8 @@ class SaveFeatures:
 
 # This is a simple model that returns that last fully-connected layer of a Resnet 18 CNN      
 class EncoderCNN(nn.Module):
-    def __init__(self):
-        super().__init__(resnet.BasicBlock, [2, 2, 2, 2])
+    def __init__(self, embed_size):
+        super(EncoderCNN, self).__init__()
         resnet = resnet18(pretrained=True)
         self.modules = list(resnet.children())[:-1]      # delete the last fc layer.
         for i in range(len(self.modules)):
