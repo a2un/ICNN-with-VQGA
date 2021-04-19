@@ -82,7 +82,6 @@ class DecoderRNN(nn.Module):
         self.lstm = nn.LSTM(embed_size, hidden_size, num_layers, batch_first=True)
         self.linear = nn.Linear(hidden_size, vocab_size)
         self.max_seg_length = max_seq_length
-        self.attention = Attention(embed_size,hidden_size,batch_size)
         self.init_h = nn.Linear(embed_size,hidden_size)
         self.init_c = nn.Linear(embed_size,hidden_size)
         self.h = None
@@ -98,8 +97,9 @@ class DecoderRNN(nn.Module):
         embeddings = self.embed(captions)
         layer_features_l = [l.size(2) for l in layer_features]
         encoder_dim = max(layer_features_l)
-        layer_features = [pad(l,(int((encoder_dim-l.size(2))/2),int((encoder_dim-l.size(2))/2),int((encoder_dim-l.size(2))/2),int((encoder_dim-l.size(2))/2))) if l.size(2) < m else l for l in layer_features]
+        layer_features = [pad(l,(int((encoder_dim-l.size(2))/2),int((encoder_dim-l.size(2))/2),int((encoder_dim-l.size(2))/2),int((encoder_dim-l.size(2))/2))) if l.size(2) < encoder_dim else l for l in layer_features]
         layer_features = torch.cat(layer_features)
+        self.attention = Attention(encoder_dim,hidden_size,hidden_size)
         # print("layer_features size", layer_features[0].size())
         # embeddings = torch.cat((features.unsqueeze(1), embeddings), 1)
         packed = pack_padded_sequence(embeddings, lengths.flatten(), batch_first=True) 
