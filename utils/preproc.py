@@ -71,7 +71,7 @@ def proc(args, mode, root_dir, file_name):
 
     # Build the models
     encoder = EncoderCNN()
-    decoder = DecoderRNN(embed_size, hidden_size, len(vocab), num_layers)
+    decoder = DecoderRNN(embed_size, hidden_size, batch_size, len(vocab), num_layers)
     
     pretrain_path = './icnn_resnet_18/resnet18-5c106cde.pth'
     icnn_encoder = resnet_18(pretrain_path,1,0,'logistic')        #resnet_18(pretrain_path, label_num, dropoutrate, losstype)
