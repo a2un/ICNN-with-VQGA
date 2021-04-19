@@ -52,7 +52,7 @@ def main():
 			
 			# Forward, backward and optimize
 			print(images.squeeze(0).size())
-			features = encoder(images)
+			features = encoder(images.squeeze(0))
 			outputs = decoder(features, questions, lengths)
 			loss = criterion(outputs, targets)
 			decoder.zero_grad()
