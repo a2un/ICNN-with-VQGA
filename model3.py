@@ -98,9 +98,11 @@ class DecoderRNN(nn.Module):
         embeddings = self.embed(captions)
         layer_features_l = [len(l) for l in layer_features]
         m = max(layer_features_l)
+        print(m)
         layer_features = [pad(l,(m-l.size(),0,m-l.size(),0)) if l.size(0) < m else l for l in layer_features ]
         layer_features = [pad(l,(0,m-l.size(),0,m-l.size())) if l.size(1) < m else l for l in layer_features ]
-        layer_features = torch.cat(layer_features)
+        # layer_features = torch.cat(layer_features)
+        print([len(l) for l in layer_features])
         # print("layer_features size", layer_features[0].size())
         # embeddings = torch.cat((features.unsqueeze(1), embeddings), 1)
         packed = pack_padded_sequence(embeddings, lengths.flatten(), batch_first=True) 
