@@ -65,8 +65,9 @@ class Attention(nn.Module):
         :param decoder_hidden: previous decoder output, a tensor of dimension (batch_size, hidden_size)
         :return: attention weighted encoding, weights
         """
-        att1 = self.encoder_att(encoder_out)                    # (batch_size, -1, embed_size)
-        att2 = self.decoder_att(decoder_hidden)                 # (batch_size, hidden_size)
+        device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+        att1 = self.encoder_att.to(device)(encoder_out)                    # (batch_size, -1, embed_size)
+        att2 = self.decoder_att.to(device)(decoder_hidden)                 # (batch_size, hidden_size)
         print("attention encoder",att1.size(), "attention decoder", att2.size())
         att = self.full_att(att1 + att2)                          # (batch_size, hidden_size)
         # alpha = self.softmax(att)                                 # (hidden_size, 1)
