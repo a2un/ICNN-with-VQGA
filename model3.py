@@ -114,15 +114,24 @@ class DecoderRNN(nn.Module):
         # outputs = self.linear(attention_weighted_encoding)
         return outputs
     
-    def sample(self, features, states=None):
+    def sample(self, layer_features, captions, lengths, states=None):
         """Generate captions for given image features using greedy search."""
         sampled_ids = []
-        inputs = features.squeeze(0).squeeze(0)
+        inputs = self.embed(captions)
+        layer_features_l = [l.size(2) for l in layer_features]
+        encoder_dim = max(layer_features_l)
+        layer_features = [pad(l,(int((encoder_dim-l.size(2))/2),int((encoder_dim-l.size(2))/2),int((encoder_dim-l.size(2))/2),int((encoder_dim-l.size(2))/2))) if l.size(2) < encoder_dim else l for l in layer_features]
+        layer_features = torch.cat(layer_features)
+        attention = Attention(encoder_dim,self.hidden_size,self.hidden_size)
+        
         for i in range(self.max_seg_length):
-            hiddens, states = self.lstm(inputs, states)          # hiddens: (batch_size, 1, hidden_size)
-            outputs = self.linear(hiddens.squeeze(1))            # outputs:  (batch_size, vocab_size)
+            packed = pack_padded_sequence(inputs, lengths.flatten(), batch_first=True) 
+            hiddens, states = self.lstm(packed, states)          # hiddens: (batch_size, 1, hidden_size)
+            attention_weighted_encoding = attention(layer_features, hiddens)
+            attention_weighted_encoding = attention_weighted_encoding * self.sigmoid(hiddens)
+            outputs = self.linear(hiddens)            # outputs:  (batch_size, vocab_size)
             _, predicted = outputs.max(1)                        # predicted: (batch_size)
             sampled_ids.append(predicted)
             inputs = self.embed(predicted)                       # inputs: (batch_size, embed_size)
-            inputs = inputs.unsqueeze(1)                         # inputs: (batch_size, 1, embed_size)
+            # inputs = inputs.unsqueeze(1)                         # inputs: (batch_size, 1, embed_size)
         sampled_ids = torch.stack(sampled_ids, 1)                # sampled_ids: (batch_size, max_seq_length)
