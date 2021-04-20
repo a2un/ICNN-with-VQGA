@@ -118,6 +118,7 @@ class DecoderRNN(nn.Module):
         """Generate captions for given image features using greedy search."""
         _, predicted = outputs.max(1)                        # predicted: (batch_size)
         inputs = self.embed(predicted)                       # inputs: (batch_size, embed_size)
+        inputs = inputs.unsqueeze(1)
         for i in range(self.max_seg_length):
             # packed = pack_padded_sequence(inputs, lengths.flatten(), batch_first=True) 
             hiddens, states = self.lstm(inputs, states)          # hiddens: (batch_size, 1, hidden_size)
