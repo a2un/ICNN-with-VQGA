@@ -67,7 +67,7 @@ if __name__ == '__main__':
 	icnn_encoder.load_state_dict(torch.load(icnn_encoder_path))
 	decoder.load_state_dict(torch.load(decoder_path))
 
-	bleu_score = test(icnn_encoder, decoder, data_loader, config['id_to_word'], epoch, True)
+	bleu_score = test(icnn_encoder, decoder, data_loader, config['id_to_word'], 0, True)
 	print(f'Average bleu score for test set: {bleu_score}')
 
 
