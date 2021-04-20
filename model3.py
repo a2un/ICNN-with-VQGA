@@ -48,7 +48,7 @@ class DecoderRNN(nn.Module):
         self.linear = nn.Linear(hidden_size, vocab_size)
         self.max_seg_length = max_seq_length
         
-    def forward(self, layer_features, captions, lengths):
+    def forward(self, features, captions, lengths):
         """Decode image feature vectors and generates captions."""
         embeddings = self.embed(captions)
         embeddings = torch.cat((features.unsqueeze(1), embeddings), 1)
@@ -57,7 +57,7 @@ class DecoderRNN(nn.Module):
         outputs = self.linear(h[0])
         return outputs
     
-    def sample(self, outputs, states=None):
+    def sample(self, features, states=None):
         """Generate captions for given image features using greedy search."""
         sampled_ids = []
         inputs = features.squeeze(0)
