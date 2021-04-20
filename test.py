@@ -19,13 +19,15 @@ def test(icnn_encoder, decoder, data_loader, id_to_word, epoch, doOutputQuestion
 		print(f'Testing step {i} of {len(data_loader)}')
 		images = images.to(device)
 		feature = icnn_encoder(images,categories, torch.Tensor([epoch+1]), get_density(categories.detach().cpu().numpy()))
-		sampled_ids = [decoder.sample(f) for f in feature]
-		sampled_ids = sampled_ids[0].cpu().numpy()          # (1, max_seq_length) -> (max_seq_length)
 		questions = questions.detach().cpu().numpy()
 		references = []
 		for item in questions:
 			references.append(id_to_word(item))
-		generated = id_to_word(sampled_ids)
+
+		for f in feature:
+			sample_ids = decoder.sample(f)	
+			sampled_ids = sampled_ids[0].cpu().numpy()          # (1, max_seq_length) -> (max_seq_length)
+			generated = id_to_word(sampled_ids)
 		
 		bleu_score = nltk.translate.bleu_score.sentence_bleu(references,generated,smoothing_function=c.method7)
 		total_bleu_score += bleu_score
