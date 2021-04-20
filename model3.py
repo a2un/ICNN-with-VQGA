@@ -12,7 +12,7 @@ class EncoderCNN(resnet.ResNet):
         super().__init__(resnet.BasicBlock, [2, 2, 2, 2])
         state_dict = load_state_dict_from_url(resnet.model_urls['resnet18'], progress=True)
         self.load_state_dict(state_dict)
-        self.modules = list(self.children())[-1]
+        self.modules = list(self.children())[:-1]
         for i in range(len(self.modules)):
             self.modules[i] = self.modules[i].to(device)
         self.linear = nn.Linear(2048, embed_size)
