@@ -116,6 +116,7 @@ class DecoderRNN(nn.Module):
     
     def sample(self, outputs, states=None):
         """Generate captions for given image features using greedy search."""
+        sampled_ids = []
         _, predicted = outputs.max(1)                        # predicted: (batch_size)
         inputs = self.embed(predicted)                       # inputs: (batch_size, embed_size)
         inputs = inputs.unsqueeze(1)
