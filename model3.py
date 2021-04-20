@@ -131,3 +131,4 @@ class DecoderRNN(nn.Module):
             inputs = self.embed(predicted)                       # inputs: (batch_size, embed_size)
             inputs = inputs.unsqueeze(1)                         # inputs: (batch_size, 1, embed_size)
         sampled_ids = torch.stack(sampled_ids, 1)
+        return sampled_ids
