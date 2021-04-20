@@ -68,7 +68,7 @@ def main():
             # summary(icnn_encoder, ((3,7,7),categories.size(), torch.Tensor([epoch + 1]).size(),density.size()))
             # layer_features = [encoder.extract_layer_features(i) for i in layers]
             # encoder.close_forward_hooks()
-            outputs = decoder(features)
+            outputs = decoder(features, questions, lengths)
             loss = criterion(outputs, targets)
             decoder.zero_grad()
             encoder.zero_grad()

@@ -18,8 +18,9 @@ def test(encoder, decoder, data_loader, id_to_word, epoch, doOutputQuestions=Fal
 	for i, (images, categories, questions, lengths) in enumerate(data_loader):
 		print(f'Testing step {i} of {len(data_loader)}')
 		images = images.to(device)
+		questions = question.to(device)
 		feature = encoder(images)
-		sampled_ids = decoder.sample(feature)
+		sampled_ids = decoder.sample(feature,questions,lengths)
 		sampled_ids = sampled_ids[0].cpu().numpy()          # (1, max_seq_length) -> (max_seq_length)
 		questions = questions.detach().cpu().numpy()
 		references = []
