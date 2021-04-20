@@ -24,7 +24,7 @@ for epoch in range(1,config['num_epochs']+1):
 	icnn_encoder_path[epoch] = os.path.join(config['model_dir'], f'icnn-encoder-{epoch}.pth')
 	decoder_path[epoch] = os.path.join(config['model_dir'], f'decoder-{epoch}.pth')
 	if not os.path.exists(icnn_encoder_path[epoch]):
-		raise Exception(f'Encoder does not exist: {encoder_path[epoch]}')
+		raise Exception(f'Encoder does not exist: {icnn_encoder_path[epoch]}')
 	if not os.path.exists(decoder_path[epoch]):
 		raise Exception(f'Decoder does not exist: {decoder_path[epoch]}')
 	
