@@ -18,13 +18,13 @@ def test(icnn_encoder, decoder, data_loader, id_to_word, epoch, doOutputQuestion
 	for i, (images, categories, questions, lengths) in enumerate(data_loader):
 		print(f'Testing step {i} of {len(data_loader)}')
 		images = images.to(device)
+		questions = questions.detach().cpu().numpy()
 		icnn_encoder.create_forward_hooks(layers)
 		feature = icnn_encoder(images,categories, torch.Tensor([epoch+1]), get_density(categories.detach().cpu().numpy()))
 		layer_features = [icnn_encoder.extract_layer_features(i) for i in layers]
 		icnn_encoder.close_forward_hooks()
 		sampled_ids = decoder.sample(layer_features,questions,lengths)
 		sampled_ids = sampled_ids[0].cpu().numpy()          # (1, max_seq_length) -> (max_seq_length)
-		questions = questions.detach().cpu().numpy()
 		references = []
 		for item in questions:
 			references.append(id_to_word(item))
