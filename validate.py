@@ -13,7 +13,7 @@ parser.add_argument('--config', type=pathlib.Path, default='config.ini', help='T
 args = parser.parse_args()
 root_dir = os.path.dirname(os.path.realpath(__file__))
 
-icnn_encoder, decoder, data_loader, config = proc(args, 'val', root_dir, 'validate.py')
+encoder, decoder, data_loader, config = proc(args, 'val', root_dir, 'validate.py')
 
 # Make sure that models exist that we are validating
 encoder_path = {}

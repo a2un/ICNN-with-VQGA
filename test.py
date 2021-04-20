@@ -18,9 +18,9 @@ def test(encoder, decoder, data_loader, id_to_word, epoch, doOutputQuestions=Fal
 	for i, (images, categories, questions, lengths) in enumerate(data_loader):
 		print(f'Testing step {i} of {len(data_loader)}')
 		images = images.to(device)
-		questions = question.to(device)
+		questions = questions.to(device)
 		feature = encoder(images)
-		sampled_ids = decoder.sample(feature,questions,lengths)
+		sampled_ids = decoder.sample(feature)
 		sampled_ids = sampled_ids[0].cpu().numpy()          # (1, max_seq_length) -> (max_seq_length)
 		questions = questions.detach().cpu().numpy()
 		references = []
@@ -53,7 +53,7 @@ if __name__ == '__main__':
 
 	encoder_path = os.path.join(config['model_dir'], 'best_encoder.pth')
 	decoder_path = os.path.join(config['model_dir'], 'best_decoder.pth')
-	if not os.path.exists(icnn_encoder_path):
+	if not os.path.exists(encoder_path):
 		raise Exception(f'Encoder does not exist: {encoder_path}')
 	if not os.path.exists(decoder_path):
 		raise Exception(f'Decoder does not exist: {decoder_path}')
