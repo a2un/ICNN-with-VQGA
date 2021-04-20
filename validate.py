@@ -47,7 +47,7 @@ for epoch in range(1,config['num_epochs']+1):
 	
 	if bleu_score > best_bleu_score:
 		best_bleu_score = bleu_score
-		best_encoder = copy.deepcopy(encoder.state_dict())
+		best_encoder = copy.deepcopy(icnn_encoder.state_dict())
 		best_decoder = copy.deepcopy(decoder.state_dict())
 		torch.save(best_encoder, best_encoder_path)
 		torch.save(best_decoder, best_decoder_path)
