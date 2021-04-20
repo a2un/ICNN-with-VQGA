@@ -114,13 +114,13 @@ class DecoderRNN(nn.Module):
         # outputs = self.linear(attention_weighted_encoding)
         return outputs
     
-    def sample(self, outputs):
+    def sample(self, outputs, states=None):
         """Generate captions for given image features using greedy search."""
         _, predicted = outputs.max(1)                        # predicted: (batch_size)
         inputs = self.embed(predicted)                       # inputs: (batch_size, embed_size)
         for i in range(self.max_seg_length):
-            packed = pack_padded_sequence(inputs, lengths.flatten(), batch_first=True) 
-            hiddens, states = self.lstm(packed)          # hiddens: (batch_size, 1, hidden_size)
+            # packed = pack_padded_sequence(inputs, lengths.flatten(), batch_first=True) 
+            hiddens, states = self.lstm(inputs, states)          # hiddens: (batch_size, 1, hidden_size)
             # attention_weighted_encoding = attention(layer_features, hiddens[0])
             # attention_weighted_encoding = attention_weighted_encoding * self.sigmoid(hiddens[0])
             # outputs = self.linear(hiddens[0])            # outputs:  (batch_size, vocab_size)
