@@ -14,7 +14,7 @@ def test(icnn_encoder, decoder, data_loader, id_to_word, epoch, doOutputQuestion
 	c = nltk.translate.bleu_score.SmoothingFunction()
 	
 	total_bleu_score = 0.0
-	
+	layers = [9,11]
 	for i, (images, categories, questions, lengths) in enumerate(data_loader):
 		print(f'Testing step {i} of {len(data_loader)}')
 		images = images.to(device)
