@@ -9,7 +9,7 @@ device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 # This is a simple model that returns that last fully-connected layer of a Resnet 18 CNN      
 class EncoderCNN(resnet.ResNet):
-    def __init__(self):
+    def __init__(self,embed_size):
         super().__init__(resnet.BasicBlock, [2, 2, 2, 2])
         state_dict = load_state_dict_from_url(resnet.model_urls['resnet18'], progress=True)
         self.load_state_dict(state_dict)
