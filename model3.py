@@ -6,39 +6,17 @@ from torchvision.models.utils import load_state_dict_from_url
 from torch.nn.utils.rnn import pack_padded_sequence
 from torch.nn.functional import pad
 
-class SaveFeatures:
-    def __init__(self, module):
-        self.hook = module.register_forward_hook(self.hook_fn)
-    def hook_fn(self, module, input, output):
-        self.features = output.clone().detach()
-    def close(self):
-        self.hook.remove()
-
 # This is a simple model that returns that last fully-connected layer of a Resnet 18 CNN      
 class EncoderCNN(resnet.ResNet):
     def __init__(self):
         super().__init__(resnet.BasicBlock, [2, 2, 2, 2])
         state_dict = load_state_dict_from_url(resnet.model_urls['resnet18'], progress=True)
         self.load_state_dict(state_dict)
-        self.activation = SaveFeatures(list(self.children())[-1])
-     
-    def __call__(self, inputs):
-        super().__call__(inputs)
-        return self.activation.features
-    
-    # Pass a list of ints representing the modules of the encoder for which you want to extract features
-    def create_forward_hooks(self, layer_list):
-        modules = list(self.modules())
-        self.activations = {i: SaveFeatures(modules[i]) for i in layer_list}
-    
-    # Pass the int value of the layer for which you want a feature map.  Only call this after passing 
-    # inputs to the encoder and you will get the output associated with those inputs
-    def extract_layer_features(self, layer):
-        return self.activations[layer].features
-    
-    def close_forward_hooks(self):
-        for activation in self.activations.values():
-            activation.close()
+        self.modules = list(self.children())[-1]
+        for i in range(len(self.modules)):
+            self.modules[i] = self.modules[i].to(device)
+        self.linear = nn.Linear(2048, embed_size)
+        self.bn = nn.BatchNorm1d(embed_size, momentum=0.01)
     
     def forward(self,images):
         with torch.no_grad():
