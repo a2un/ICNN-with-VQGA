@@ -125,8 +125,8 @@ class DecoderRNN(nn.Module):
         attention = Attention(encoder_dim,self.hidden_size,self.hidden_size)
         print(inputs.size())
         for i in range(self.max_seg_length):
-            packed = pack_padded_sequence(inputs, lengths.flatten(), batch_first=True) 
-            hiddens, states = self.lstm(packed, states)          # hiddens: (batch_size, 1, hidden_size)
+            # packed = pack_padded_sequence(inputs, lengths.flatten(), batch_first=True) 
+            hiddens, states = self.lstm(inputs, states)          # hiddens: (batch_size, 1, hidden_size)
             attention_weighted_encoding = attention(layer_features, hiddens[0])
             attention_weighted_encoding = attention_weighted_encoding * self.sigmoid(hiddens[0])
             outputs = self.linear(hiddens[0])            # outputs:  (batch_size, vocab_size)
