@@ -31,7 +31,7 @@ def test(icnn_encoder, decoder, data_loader, id_to_word, epoch, doOutputQuestion
 		for item in questions:
 			references.append(id_to_word(item))
 		generated = id_to_word(sampled_ids)
-		
+		print(references,generated)
 		bleu_score = nltk.translate.bleu_score.sentence_bleu(references,generated,smoothing_function=c.method7)
 		total_bleu_score += bleu_score
 		
