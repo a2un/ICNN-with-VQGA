@@ -19,7 +19,7 @@ def test(icnn_encoder, decoder, data_loader, id_to_word, epoch, doOutputQuestion
 		print(f'Testing step {i} of {len(data_loader)}')
 		images = images.to(device)
 		feature = icnn_encoder(images,categories, torch.Tensor([epoch+1]), get_density(categories.detach().cpu().numpy()))
-		sampled_ids = decoder.sample(feature)
+		sampled_ids = [decoder.sample(f) for f in feature]
 		sampled_ids = sampled_ids[0].cpu().numpy()          # (1, max_seq_length) -> (max_seq_length)
 		questions = questions.detach().cpu().numpy()
 		references = []
