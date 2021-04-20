@@ -1,5 +1,6 @@
 import torch
 import torch.nn as nn
+import torch.nn.functional as F
 import torchvision.models.resnet as resnet
 from torchvision.models.utils import load_state_dict_from_url
 from torch.nn.utils.rnn import pack_padded_sequence
@@ -38,6 +39,18 @@ class EncoderCNN(resnet.ResNet):
     def close_forward_hooks(self):
         for activation in self.activations.values():
             activation.close()
+    
+    def forward(self,images):
+        with torch.no_grad():
+            x = self.modules[0](images)
+            x = F.max_pool2d(x, kernel_size=3, stride=2)
+            for i in range(1, len(self.modules)-1):
+                x = self.modules[i](x)
+            x = F.avg_pool2d(x, kernel_size=2)
+            x = x.view(x.size(0), -1)
+        
+        features = self.bn(self.linear(x))
+        return features
 
 class DecoderRNN(nn.Module):
     def __init__(self, embed_size, hidden_size, batch_size, vocab_size, num_layers, max_seq_length=20):
@@ -51,6 +64,7 @@ class DecoderRNN(nn.Module):
     def forward(self, features, captions, lengths):
         """Decode image feature vectors and generates captions."""
         embeddings = self.embed(captions)
+        f
         embeddings = torch.cat((features, embeddings), 1)
         packed = pack_padded_sequence(embeddings, lengths.flatten(), batch_first=True) 
         h,_ = self.lstm(packed)
