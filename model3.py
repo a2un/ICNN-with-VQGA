@@ -123,7 +123,7 @@ class DecoderRNN(nn.Module):
         layer_features = [pad(l,(int((encoder_dim-l.size(2))/2),int((encoder_dim-l.size(2))/2),int((encoder_dim-l.size(2))/2),int((encoder_dim-l.size(2))/2))) if l.size(2) < encoder_dim else l for l in layer_features]
         layer_features = torch.cat(layer_features)
         attention = Attention(encoder_dim,self.hidden_size,self.hidden_size)
-        
+        print(inputs.size())
         for i in range(self.max_seg_length):
             packed = pack_padded_sequence(inputs, lengths.flatten(), batch_first=True) 
             hiddens, states = self.lstm(packed, states)          # hiddens: (batch_size, 1, hidden_size)
