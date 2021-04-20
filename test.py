@@ -19,6 +19,7 @@ def test(icnn_encoder, decoder, data_loader, id_to_word, epoch, doOutputQuestion
 		print(f'Testing step {i} of {len(data_loader)}')
 		images = images.to(device)
 		questions = questions.to(device)
+		lengths = torch.Tensor(np.array(lengths).reshape((len(lengths),1)))
 		icnn_encoder.create_forward_hooks(layers)
 		feature = icnn_encoder(images,categories, torch.Tensor([epoch+1]), get_density(categories.detach().cpu().numpy()))
 		layer_features = [icnn_encoder.extract_layer_features(i) for i in layers]
