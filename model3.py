@@ -5,6 +5,7 @@ import torchvision.models.resnet as resnet
 from torchvision.models.utils import load_state_dict_from_url
 from torch.nn.utils.rnn import pack_padded_sequence
 from torch.nn.functional import pad
+device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 # This is a simple model that returns that last fully-connected layer of a Resnet 18 CNN      
 class EncoderCNN(resnet.ResNet):
